@@ -11,7 +11,7 @@ can be attached to improve time accuracy or to keep the time up-to-date
 while running. If RTC is used, the Time library by Michael Margolis
 keeps the time.
 
-The following hardware is used:
+The following hardware components are used:
 
 Remote:
 - ESP8266 (ESP-12E)
@@ -22,6 +22,6 @@ Base
 - ESP8266 (ESP-12E)
 - DHT22
 - 6 AA batteries
-- LDO 3.3v regulator
-- 3.3v SPI LCD
-- 3.3v I2C RTC (optional)
+- LD111733 3.3v regulator
+- 3.3v 2.4" 240x320 SD ILI9341 GM SPI LCD
+- 3.3v DS3231 AT24C32 I2C RTC (optional)
