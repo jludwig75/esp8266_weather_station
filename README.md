@@ -27,4 +27,5 @@ Base
 - 3.3v DS3231 AT24C32 I2C RTC (optional)
 
 Proposed Weather Station Display:
+
 ![Alt text](/Weather Station Display.png?raw=true "Proposed Weather Station Display")
