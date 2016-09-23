@@ -1,4 +1,4 @@
-# esp8266_weather_station
+# ESP8266 Weather Station
 Weather station base and remote with ESP8266
 
 This is the source for an ESP8266 based weather station base and remote.
