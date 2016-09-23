@@ -1,7 +1,7 @@
 # ESP8266 Weather Station
 Weather station base and remote with ESP8266
 
-This is the source for an ESP8266 based weather station base and remote.
+This is the source for an ESP8266-based weather station base and remote.
 All firmware is built to run on the ESP8266; no other MCU is required.
 The weather station uses a local DHT22 to get indoor temperature and
 humidity and an LCD display to output the date, time, indoor and outdoor
