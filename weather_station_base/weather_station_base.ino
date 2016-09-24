@@ -11,7 +11,7 @@
 #define DHTTYPE DHT22
 #define DHTPIN  2
 #define DISPLAY_UPDATE_INTERVAL_MS      1000              // 1 second
-#define LOCAL_SENSOR_UPDATE_INTERVAL_MS (60 * 1000)       // 1 minute
+#define LOCAL_SENSOR_UPDATE_INTERVAL_MS ( 1 * 60 * 1000)  // 1 minute
 #define UPDATE_TIME_UPDATE_INTERVAL_MS  (15 * 60 * 1000)  // 15 minutes
 #define UDP_LISTEN_PORT                 8888
 #define TEMP_REPORT_SERVER_LISTEN_PORT  8080
@@ -31,7 +31,7 @@ static const char ntpServerName[] = "us.pool.ntp.org";
 //static const char ntpServerName[] = "time-b.timefreq.bldrdoc.gov";
 //static const char ntpServerName[] = "time-c.timefreq.bldrdoc.gov";
 
-const int timeZone = 1;     // Central European Time
+const int timeZone = -6;     // Central European Time
 //const int timeZone = -5;  // Eastern Standard Time (USA)
 //const int timeZone = -4;  // Eastern Daylight Time (USA)
 //const int timeZone = -8;  // Pacific Standard Time (USA)
@@ -99,12 +99,12 @@ bool connectWiFi(int retries)
 
 struct sensor_data
 {
-  sensor_data() : temperature(NAN), humidity(NAN)
+  sensor_data() : temperature(0xffff), humidity(0xffff)
   {
     
   }
-  float temperature;
-  float humidity;
+  int temperature;
+  int humidity;
   bool operator==(const sensor_data & other) const
   {
     return temperature == other.temperature && humidity == other.humidity;
@@ -180,7 +180,9 @@ public:
   // higher the value.  The default for a 16mhz AVR is a value of 6.  For an
   // Arduino Due that runs at 84mhz a value of 30 works.
   // This is for the ESP8266 processor on ESP-01 
-  weather_station_base(uint8_t pin, uint8_t type) : m_wifi_connected(false), m_dht(pin, type, 11), m_server(TEMP_REPORT_SERVER_LISTEN_PORT) // 11 works fine for ESP8266
+  weather_station_base(uint8_t pin, uint8_t type) : m_wifi_connected(false), m_dht(pin, type, 11), m_server(TEMP_REPORT_SERVER_LISTEN_PORT), // 11 works fine for ESP8266
+    m_last_time_update(millis()),
+    m_last_local_sensor_update(millis())
   {
     
   }
@@ -213,15 +215,14 @@ public:
     // ???: Sleep for DHT? probably not needed, because there will be some delay connecting to the access point.
 
     // Get the initial data.
-    update_time();
-    update_local_sensor_data();
+    update_time(true);
+    update_local_sensor_data(true);
     // Draw the display
     draw_display();
 
     // Start the timers
     m_display_timer.attach_ms(DISPLAY_UPDATE_INTERVAL_MS, update_display_timer_func, this);
-    m_update_sensor_timer.attach_ms(LOCAL_SENSOR_UPDATE_INTERVAL_MS, update_sensor_data_timer_func, this);
-    m_update_time_timer.attach_ms(UPDATE_TIME_UPDATE_INTERVAL_MS, update_time_timer_func, this);
+    //m_update_time_timer.attach_ms(UPDATE_TIME_UPDATE_INTERVAL_MS, update_time_timer_func, this);
   }
 
   void handle_sensor_data_post()
@@ -239,6 +240,70 @@ public:
     Serial.println(message);
 
     m_server.send(200, "text/plain", "OK");
+  }
+  
+  void update_local_sensor_data(bool update_now = false)
+  {
+    time_t current_time = millis();
+    if (!update_now && current_time - m_last_local_sensor_update < LOCAL_SENSOR_UPDATE_INTERVAL_MS)
+    {
+      return;
+    }
+    m_last_local_sensor_update = current_time;
+    
+    float humidity = NAN;
+    float temperature = NAN;
+
+    for(int i = 0; i < 5 && (isnan(humidity) || isnan(temperature)); i++)
+    {
+      humidity = m_dht.readHumidity();
+      temperature = m_dht.readTemperature(true);
+      delay(1000);
+    }
+
+    m_current_sensor_data.humidity = humidity;
+    m_current_sensor_data.temperature = temperature;
+
+    if (isnan(m_current_sensor_data.humidity))
+    {
+      Serial.println("Read bad humidity");
+    }
+
+    if (isnan(m_current_sensor_data.temperature))
+    {
+      Serial.println("Read bad temperature");
+    }
+  }
+
+  void update_time(bool update_now = false)
+  {
+    time_t current_time = millis();
+    if (!update_now && current_time - m_last_time_update < UPDATE_TIME_UPDATE_INTERVAL_MS)
+    {
+      return;
+    }
+    m_last_time_update = current_time;
+    
+    if (!m_wifi_connected)
+    {
+      m_wifi_connected = connectWiFi(60); // About 30 seconds
+      if (!m_wifi_connected)
+      {
+        Serial.println("Failed to start WiFi! Skipping time update.");
+        return;
+      }
+    }
+    
+    // Get the time via NTP
+    time_t new_time = getNtpTime(m_udp);
+
+    // Update the time
+    if (new_time == 0)
+    {
+      return;
+    }
+    
+    setTime(new_time);
   }
   
 protected:
@@ -264,44 +329,10 @@ protected:
     }
   }
 
-  static void update_sensor_data_timer_func(weather_station_base *ws_base)
-  {
-    ws_base->update_local_sensor_data();
-  }
-  void update_local_sensor_data()
-  {
-    m_current_sensor_data.humidity = m_dht.readHumidity();
-    m_current_sensor_data.temperature = m_dht.readTemperature(true);
-  }
-
   static void update_time_timer_func(weather_station_base *ws_base)
   {
     ws_base->update_time();
   }
-  void update_time()
-  {
-    if (!m_wifi_connected)
-    {
-      m_wifi_connected = connectWiFi(60); // About 30 seconds
-      if (!m_wifi_connected)
-      {
-        Serial.println("Failed to start WiFi! Skipping time update.");
-        return;
-      }
-    }
-    
-    // Get the time via NTP
-    time_t new_time = getNtpTime(m_udp);
-
-    // Update the time
-    if (new_time == 0)
-    {
-      return;
-    }
-    
-    setTime(new_time);
-  }
-  
 private:
   void draw_display()
   {
@@ -313,11 +344,12 @@ private:
     Serial.println(time_str);
   }
   bool m_wifi_connected;
+  time_t m_last_time_update;
+  time_t m_last_local_sensor_update;
   DHT m_dht;
   ESP8266WebServer m_server;
   WiFiUDP m_udp;
   Ticker m_display_timer;
-  Ticker m_update_sensor_timer;
   Ticker m_update_time_timer;
   sensor_data m_current_sensor_data;
   display_data m_last_display_data;
@@ -331,11 +363,16 @@ void sensor_data_post_handler()
 
 void setup()
 {
+  Serial.begin(115200);
   g_weather_station_base.init();
 }
 
+long count = 0;
+
 void loop()
 {
+  g_weather_station_base.update_local_sensor_data();
+  g_weather_station_base.update_time();
 }
 
 /*-------- NTP code ----------*/
