@@ -14,9 +14,11 @@
 const char *ap_ssid         = "JRL_WS_0";
 const char *ap_password     = "!v734@89h789g";
 #define TEMP_REPORT_SERVER_LISTEN_PORT  8080
-const char * report_url = "/report_sensor_data";
+const char *report_url = "/report_sensor_data";
+const char *temp_var_name = "temp";
+const char *humidity_var_name = "humidity";
 
-const char* report_server = "192.168.4.1";
+const char *report_server = "192.168.4.1";
 
 
 // Initialize DHT sensor 
@@ -55,7 +57,7 @@ void sendSensorData(const char *server, float temperature, float humidity)
 {
   WiFiClient client;
 
-  String postData = "station_id=2&temp=" + String((int)temperature) + "&humidity=" + String((int)humidity);
+  String postData = String("station_id=2&") + temp_var_name + "=" + String((int)temperature) + "&" + humidity_var_name + "=" + String((int)humidity);
   
   // If there's a successful connection, send the HTTP POST request
   Serial.println("connecting...");
