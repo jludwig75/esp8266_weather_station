@@ -10,9 +10,14 @@
 #define DHTTYPE DHT22
 #define DHTPIN  2
 
-const char AP_Name[] = "WEATHER_STATION_0";
-const char WiFiAPPSK[] = "sparkfun";       // Note... need to change
+// Data shared between client and server:
+const char *ap_ssid         = "JRL_WS_0";
+const char *ap_password     = "!v734@89h789g";
+#define TEMP_REPORT_SERVER_LISTEN_PORT  8080
+const char * report_url = "/report_sensor_data";
+
 const char* report_server = "192.168.4.1";
+
 
 // Initialize DHT sensor 
 // NOTE: For working with a faster than ATmega328p 16 MHz Arduino chip, like an ESP8266,
@@ -30,7 +35,7 @@ const unsigned long report_interval_ms = report_interval_minutes * 60 * 1000;   
 void connectWiFi(void)
 {
   // Connect to WiFi network
-  WiFi.begin(AP_Name, WiFiAPPSK);
+  WiFi.begin(ap_ssid, ap_password);
   Serial.print("\n\r \n\rWorking to connect");
 
   // Wait for connection
@@ -41,7 +46,7 @@ void connectWiFi(void)
   Serial.println("");
   Serial.println("DHT Weather Reporting Client");
   Serial.print("Connected to ");
-  Serial.println(AP_Name);
+  Serial.println(ap_ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 }
@@ -54,11 +59,11 @@ void sendSensorData(const char *server, float temperature, float humidity)
   
   // If there's a successful connection, send the HTTP POST request
   Serial.println("connecting...");
-  if (client.connect(server, 8080))
+  if (client.connect(server, TEMP_REPORT_SERVER_LISTEN_PORT))
   {
     Serial.println("connected to server");
 
-    client.println("POST /report_sensor_data HTTP/1.1");
+    client.println(String("POST ") + report_url + " HTTP/1.1");
 
     client.println("Host: " + String(server));
     client.println("User-Agent: Arduino/1.0");
@@ -105,5 +110,4 @@ void setup(void)
 void loop(void)
 {
 } 
-
 

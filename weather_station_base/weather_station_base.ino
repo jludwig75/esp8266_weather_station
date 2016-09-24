@@ -14,13 +14,16 @@
 #define LOCAL_SENSOR_UPDATE_INTERVAL_MS ( 1 * 60 * 1000)  // 1 minute
 #define UPDATE_TIME_UPDATE_INTERVAL_MS  (15 * 60 * 1000)  // 15 minutes
 #define UDP_LISTEN_PORT                 8888
+
+// Data shared between client and server:
+const char *ap_ssid         = "JRL_WS_0";
+const char *ap_password     = "!v734@89h789g";
 #define TEMP_REPORT_SERVER_LISTEN_PORT  8080
+const char * report_url = "/report_sensor_data";
 
 
 time_t getNtpTime(WiFiUDP & udp);
 
-const char *ap_ssid         = "JRL_WS_0";
-const char *ap_password     = "!v734@89h789g";
 const char* ssid            = "Caradhras";
 const char* password        = "Speak friend.";
 
@@ -208,7 +211,7 @@ public:
     Serial.println(m_udp.localPort());
 
     Serial.println("Starting web server...\n");
-    m_server.on("/post_sensor_data", HTTP_POST, sensor_data_post_handler);
+    m_server.on(report_url, HTTP_POST, sensor_data_post_handler);
     m_server.begin();
     Serial.println("Web server started.\n");
 
