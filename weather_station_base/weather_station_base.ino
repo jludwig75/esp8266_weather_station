@@ -56,7 +56,7 @@ bool startAccessPoint()
   }
 
   // Start the AP
-  if (!WiFi.softAP(ap_ssid, ap_ssid))
+  if (!WiFi.softAP(ap_ssid, ap_password))
   {
     Serial.println("Failed to start access point");
     return false;
@@ -222,11 +222,10 @@ public:
   // higher the value.  The default for a 16mhz AVR is a value of 6.  For an
   // Arduino Due that runs at 84mhz a value of 30 works.
   // This is for the ESP8266 processor on ESP-01 
-  weather_station_base(uint8_t pin, uint8_t type) : m_wifi_connected(false), m_dht(pin, type, 11), m_server(TEMP_REPORT_SERVER_LISTEN_PORT), // 11 works fine for ESP8266
+  weather_station_base(uint8_t pin, uint8_t type) : m_wifi_connected(false), m_dht(pin, type, 11), m_server(IPAddress((uint32_t)0), TEMP_REPORT_SERVER_LISTEN_PORT), // 11 works fine for ESP8266
     m_last_time_update(millis()),
     m_last_local_sensor_update(millis())
   {
-    
   }
   // setup() methods
   void init()
@@ -238,6 +237,13 @@ public:
       reset();
     }
 
+    Serial.println("Starting web server...\n");
+    m_server = ESP8266WebServer(WiFi.softAPIP(), TEMP_REPORT_SERVER_LISTEN_PORT);
+
+    m_server.on(report_url, sensor_data_post_handler);
+    m_server.begin();
+    Serial.println("Web server started.\n");
+
     m_wifi_connected = connectWiFi(60); // About 30 seconds
     if (!m_wifi_connected)
     {
@@ -248,11 +254,6 @@ public:
     m_udp.begin(UDP_LISTEN_PORT);
     Serial.print("Local NTP UDP port: ");
     Serial.println(m_udp.localPort());
-
-    Serial.println("Starting web server...\n");
-    m_server.on(report_url, HTTP_POST, sensor_data_post_handler);
-    m_server.begin();
-    Serial.println("Web server started.\n");
 
     // ???: Sleep for DHT? probably not needed, because there will be some delay connecting to the access point.
 

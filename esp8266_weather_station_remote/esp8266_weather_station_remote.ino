@@ -60,7 +60,7 @@ void sendSensorData(const char *server, float temperature, float humidity)
   String postData = String("station_id=2&") + temp_var_name + "=" + String((int)temperature) + "&" + humidity_var_name + "=" + String((int)humidity);
   
   // If there's a successful connection, send the HTTP POST request
-  Serial.println("connecting...");
+  Serial.printf("connecting to %s...\n", server);
   if (client.connect(server, TEMP_REPORT_SERVER_LISTEN_PORT))
   {
     Serial.println("connected to server");
