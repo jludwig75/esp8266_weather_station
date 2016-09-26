@@ -263,9 +263,8 @@ public:
     // Draw the display
     draw_display();
 
-    // Start the timers
+    // Start the display update timer
     m_display_timer.attach_ms(DISPLAY_UPDATE_INTERVAL_MS, update_display_timer_func, this);
-    //m_update_time_timer.attach_ms(UPDATE_TIME_UPDATE_INTERVAL_MS, update_time_timer_func, this);
   }
 
   void handle_sensor_data_post()
@@ -290,7 +289,38 @@ public:
 
     m_server.send(200, "text/plain", "OK");
   }
+
+  void on_loop()
+  {
+    update_local_sensor_data();
+    update_time();
+    m_server.handleClient();
+  }
   
+protected:
+  static void update_display_timer_func(weather_station_base *ws_base)
+  {
+    ws_base->update_display();
+  }
+  void update_display()
+  {
+    // Get a snapshot of the time and sensor data.
+    time_t current_time = now();
+    sensor_data current_local_sensor_data = m_current_local_sensor_data;
+    sensor_data current_remote_sensor_data = m_current_remote_sensor_data;
+
+    // See if it's different than what we last displayed.
+    if (m_last_display_data.changed(current_local_sensor_data, current_remote_sensor_data, current_time))
+    {
+      // Update the display if anything has changed.
+      draw_display();
+
+      m_last_display_data.update(current_local_sensor_data, current_remote_sensor_data, current_time);  // Use same timestamp we checked against.
+                                                                                                        // So that in case the time just advanced,
+                                                                        // we'll know to update the display next time.
+    }
+  }
+
   void update_local_sensor_data(bool update_now = false)
   {
     time_t current_time = millis();
@@ -342,7 +372,6 @@ public:
         return;
       }
     }
-    
     // Get the time via NTP
     time_t new_time = getNtpTime(m_udp);
 
@@ -355,34 +384,7 @@ public:
     setTime(new_time);
   }
   
-protected:
-  static void update_display_timer_func(weather_station_base *ws_base)
-  {
-    ws_base->update_display();
-  }
-  void update_display()
-  {
-    // Get a snapshot of the time and sensor data.
-    time_t current_time = now();
-    sensor_data current_local_sensor_data = m_current_local_sensor_data;
-    sensor_data current_remote_sensor_data = m_current_remote_sensor_data;
-
-    // See if it's different than what we last displayed.
-    if (m_last_display_data.changed(current_local_sensor_data, current_remote_sensor_data, current_time))
-    {
-      // Update the display if anything has changed.
-      draw_display();
-
-      m_last_display_data.update(current_local_sensor_data, current_remote_sensor_data, current_time);  // Use same timestamp we checked against.
-                                                                                                        // So that in case the time just advanced,
-                                                                        // we'll know to update the display next time.
-    }
-  }
-
-  static void update_time_timer_func(weather_station_base *ws_base)
-  {
-    ws_base->update_time();
-  }
+    
 private:
   void draw_display()
   {
@@ -422,8 +424,7 @@ long count = 0;
 
 void loop()
 {
-  g_weather_station_base.update_local_sensor_data();
-  g_weather_station_base.update_time();
+  g_weather_station_base.on_loop();
 }
 
 /*-------- NTP code ----------*/
