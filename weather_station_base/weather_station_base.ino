@@ -211,6 +211,8 @@ String pad_int(int val, int width, char fill)
 
 void sensor_data_post_handler();
 
+void root_handler();
+
 class weather_station_base
 {
 public:
@@ -222,7 +224,7 @@ public:
   // higher the value.  The default for a 16mhz AVR is a value of 6.  For an
   // Arduino Due that runs at 84mhz a value of 30 works.
   // This is for the ESP8266 processor on ESP-01 
-  weather_station_base(uint8_t pin, uint8_t type) : m_wifi_connected(false), m_dht(pin, type, 11), m_server(IPAddress((uint32_t)0), TEMP_REPORT_SERVER_LISTEN_PORT), // 11 works fine for ESP8266
+  weather_station_base(uint8_t pin, uint8_t type) : m_wifi_connected(false), m_dht(pin, type, 11), m_server(TEMP_REPORT_SERVER_LISTEN_PORT), // 11 works fine for ESP8266
     m_last_time_update(millis()),
     m_last_local_sensor_update(millis())
   {
@@ -237,18 +239,17 @@ public:
       reset();
     }
 
-    Serial.println("Starting web server...\n");
-    m_server = ESP8266WebServer(WiFi.softAPIP(), TEMP_REPORT_SERVER_LISTEN_PORT);
-
-    m_server.on(report_url, sensor_data_post_handler);
-    m_server.begin();
-    Serial.println("Web server started.\n");
-
     m_wifi_connected = connectWiFi(60); // About 30 seconds
     if (!m_wifi_connected)
     {
       Serial.println("Failed to start WiFi! Continuing without WiFi");
     }
+
+    Serial.println("Starting web server...\n");
+    m_server.on(report_url, HTTP_POST, sensor_data_post_handler);
+    m_server.on("/", root_handler);
+    m_server.begin();
+    Serial.println("Web server started.\n");
 
     Serial.println("Starting UDP");
     m_udp.begin(UDP_LISTEN_PORT);
@@ -256,19 +257,25 @@ public:
     Serial.println(m_udp.localPort());
 
     // ???: Sleep for DHT? probably not needed, because there will be some delay connecting to the access point.
+    delay(1000);
 
     // Get the initial data.
     update_time(true);
     update_local_sensor_data(true);
-    // Draw the display
-    draw_display();
+    update_display(true);
 
     // Start the display update timer
     m_display_timer.attach_ms(DISPLAY_UPDATE_INTERVAL_MS, update_display_timer_func, this);
   }
 
+  void handle_root()
+  {
+    m_server.send(200, "text/plain", "Hello");
+  }
+
   void handle_sensor_data_post()
   {
+    /*
     String message = "Received sensor data post\n\n";
     message += "URI: ";
     message += m_server.uri();
@@ -282,6 +289,7 @@ public:
     Serial.println(message);
 
     Serial.printf("temp = \"%s\", humidity = \"%s\"\n", m_server.arg(temp_var_name).c_str(), m_server.arg(humidity_var_name).c_str());
+    */
 
     // Update the remote sensor data.
     m_current_remote_sensor_data.temperature = m_server.arg(temp_var_name).toInt();
@@ -302,7 +310,7 @@ protected:
   {
     ws_base->update_display();
   }
-  void update_display()
+  void update_display(bool update_now = false)
   {
     // Get a snapshot of the time and sensor data.
     time_t current_time = now();
@@ -310,14 +318,13 @@ protected:
     sensor_data current_remote_sensor_data = m_current_remote_sensor_data;
 
     // See if it's different than what we last displayed.
-    if (m_last_display_data.changed(current_local_sensor_data, current_remote_sensor_data, current_time))
+    if (update_now || m_last_display_data.changed(current_local_sensor_data, current_remote_sensor_data, current_time))
     {
-      // Update the display if anything has changed.
-      draw_display();
-
       m_last_display_data.update(current_local_sensor_data, current_remote_sensor_data, current_time);  // Use same timestamp we checked against.
                                                                                                         // So that in case the time just advanced,
-                                                                        // we'll know to update the display next time.
+                                                                                                        // we'll know to update the display next time.
+      // Update the display if anything has changed.
+      draw_display();
     }
   }
 
@@ -412,6 +419,12 @@ private:
 void sensor_data_post_handler()
 {
   g_weather_station_base.handle_sensor_data_post();
+}
+
+
+void root_handler()
+{
+  g_weather_station_base.handle_root();
 }
 
 void setup()

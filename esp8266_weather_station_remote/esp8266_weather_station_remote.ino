@@ -36,6 +36,10 @@ const unsigned long report_interval_ms = report_interval_minutes * 60 * 1000;   
  
 void connectWiFi(void)
 {
+  // NOTE: Aparently this is crucial. Without this, I can connect to the web server
+  // with my phone, but another ESP cannot. Just setting this fixes the problem.
+  WiFi.mode(WIFI_STA);
+  
   // Connect to WiFi network
   WiFi.begin(ap_ssid, ap_password);
   Serial.print("\n\r \n\rWorking to connect");
@@ -60,7 +64,7 @@ void sendSensorData(const char *server, float temperature, float humidity)
   String postData = String("station_id=2&") + temp_var_name + "=" + String((int)temperature) + "&" + humidity_var_name + "=" + String((int)humidity);
   
   // If there's a successful connection, send the HTTP POST request
-  Serial.printf("connecting to %s...\n", server);
+  Serial.printf("connecting to %s on port %u...\n", server, TEMP_REPORT_SERVER_LISTEN_PORT);
   if (client.connect(server, TEMP_REPORT_SERVER_LISTEN_PORT))
   {
     Serial.println("connected to server");
