@@ -15,11 +15,52 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="weather_station_base.ino" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="__vm\.weather_station_base.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="wifi_station.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wifi_ap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ntp_client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sensor_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="display_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ws_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="weather_station_base_class.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="wifi_station.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wifi_ap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ntp_client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sensor_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="display_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="weather_station_base_class.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="weather_station_base.ino" />
   </ItemGroup>
 </Project>
