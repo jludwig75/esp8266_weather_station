@@ -7,6 +7,8 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <DHT.h>
+#include "wifi_station.h"
+
 #define DHTTYPE DHT22
 #define DHTPIN  2
 
@@ -104,7 +106,7 @@ void setup(void)
   Serial.println("Temperature: " + String((int)temp_f) + ", Humidity: " + String((int)humidity));
 
   // Connect to WiFi network
-  connectWiFi();
+  connect_wifi(ap_ssid, ap_password, 120);
 
   Serial.println("Sending sensor data to server...");
   sendSensorData(report_server, temp_f, humidity);
