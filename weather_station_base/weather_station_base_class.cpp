@@ -41,7 +41,7 @@ weather_station_base::weather_station_base(const char *host_ssid, const char *ho
 void weather_station_base::init()
 {
 	m_dht.begin();
-	if (!start_access_point(m_host_ssid.c_str(), m_host_password.c_str()))
+	if (!start_access_point(ap_ssid, ap_password))
 	{
 		Serial.println("Failed to start access point! Resetting processor...");
 		reset();
