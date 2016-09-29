@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="html">
+      <UniqueIdentifier>{ace6b667-b755-420e-9828-42aecc4eee17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.weather_station_base.vsarduino.h">
@@ -62,5 +65,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="weather_station_base.ino" />
+    <None Include="index.html">
+      <Filter>html</Filter>
+    </None>
+    <None Include="time.html">
+      <Filter>html</Filter>
+    </None>
+    <None Include="wifi_config.html">
+      <Filter>html</Filter>
+    </None>
   </ItemGroup>
 </Project>
