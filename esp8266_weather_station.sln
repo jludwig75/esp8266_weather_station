@@ -7,20 +7,46 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "weather_station_base", "wea
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "esp8266_weather_station_remote", "esp8266_weather_station_remote\esp8266_weather_station_remote.vcxproj", "{ECC6FA14-7C84-4662-B533-608AA1CD9669}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_web_server", "simple_web_server\simple_web_server.vcxproj", "{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ws_sim", "ws_sim\ws_sim.vcxproj", "{2994CE42-43E4-4B28-BDFC-0F0038A69510}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x64.ActiveCfg = Debug|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.ActiveCfg = Debug|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x64.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Debug|x64.ActiveCfg = Debug|Win32
 		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Debug|x86.ActiveCfg = Debug|Win32
 		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Debug|x86.Build.0 = Debug|Win32
+		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Release|x64.ActiveCfg = Release|Win32
 		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Release|x86.ActiveCfg = Release|Win32
 		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Release|x86.Build.0 = Release|Win32
+		{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}.Debug|x64.ActiveCfg = Debug|x64
+		{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}.Debug|x64.Build.0 = Debug|x64
+		{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}.Debug|x86.ActiveCfg = Debug|Win32
+		{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}.Debug|x86.Build.0 = Debug|Win32
+		{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}.Release|x64.ActiveCfg = Release|x64
+		{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}.Release|x64.Build.0 = Release|x64
+		{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}.Release|x86.ActiveCfg = Release|Win32
+		{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}.Release|x86.Build.0 = Release|Win32
+		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Debug|x64.ActiveCfg = Debug|x64
+		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Debug|x64.Build.0 = Debug|x64
+		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Debug|x86.ActiveCfg = Debug|Win32
+		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Debug|x86.Build.0 = Debug|Win32
+		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Release|x64.ActiveCfg = Release|x64
+		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Release|x64.Build.0 = Release|x64
+		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Release|x86.ActiveCfg = Release|Win32
+		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
