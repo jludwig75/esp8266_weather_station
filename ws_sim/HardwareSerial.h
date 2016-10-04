@@ -139,6 +139,9 @@ class HardwareSerial : public Stream
     void _tx_udr_empty_irq(void);
 };
 
+extern HardwareSerial Serial;
+
+
 #if defined(UBRRH) || defined(UBRR0H)
   extern HardwareSerial Serial;
   #define HAVE_HWSERIAL0

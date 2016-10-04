@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "weather_station_base", "weather_station_base\weather_station_base.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_web_server", "simple_web_server\simple_web_server.vcxproj", "{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ws_sim", "ws_sim\ws_sim.vcxproj", "{2994CE42-43E4-4B28-BDFC-0F0038A69510}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "esp8266_test_web_server", "esp8266_test_web_server\esp8266_test_web_server.vcxproj", "{EC621764-9D9C-4025-AF43-AD52BB67A54F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,12 @@ Global
 		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Release|x64.Build.0 = Release|x64
 		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Release|x86.ActiveCfg = Release|Win32
 		{2994CE42-43E4-4B28-BDFC-0F0038A69510}.Release|x86.Build.0 = Release|Win32
+		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Debug|x64.ActiveCfg = Debug|Win32
+		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Debug|x86.ActiveCfg = Debug|Win32
+		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Debug|x86.Build.0 = Debug|Win32
+		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Release|x64.ActiveCfg = Release|Win32
+		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Release|x86.ActiveCfg = Release|Win32
+		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

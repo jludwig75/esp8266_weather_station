@@ -36,13 +36,13 @@
     <ClCompile Include="libb64\cencode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sketch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="spiffs_api.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HardwareSerialSim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,5 +50,10 @@
     <ClInclude Include="ESP8266WebServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\esp8266_test_web_server\esp8266_test_web_server.ino">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
