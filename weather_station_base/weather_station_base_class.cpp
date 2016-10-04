@@ -77,7 +77,8 @@ void weather_station_base::init()
 
 void weather_station_base::handle_root()
 {
-	m_server.send(200, "text/plain", "Hello");
+	String display = m_last_display_data.get_date_string() + " " + m_last_display_data.get_time_string() + " In: " + m_last_display_data.get_local_sensor_string() + " Out: " + m_last_display_data.get_remote_sensor_string();
+	m_server.send(200, "text/html", display);
 }
 
 void weather_station_base::handle_sensor_data_post()
