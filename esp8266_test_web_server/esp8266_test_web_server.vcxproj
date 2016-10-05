@@ -82,6 +82,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\shared\OOWebServer.h" />
     <ClInclude Include="..\shared\wifi_station.h" />
     <ClInclude Include="__vm\.esp8266_test_web_server.vsarduino.h" />
   </ItemGroup>

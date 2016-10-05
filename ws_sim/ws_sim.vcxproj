@@ -167,6 +167,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\shared\OOWebServer.h" />
     <ClInclude Include="ESP8266WebServer.h" />
   </ItemGroup>
   <ItemGroup>

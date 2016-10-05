@@ -45,15 +45,14 @@
     <ClCompile Include="HardwareSerialSim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\esp8266_test_web_server\esp8266_test_web_server.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESP8266WebServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\esp8266_test_web_server\esp8266_test_web_server.ino">
-      <Filter>Source Files</Filter>
-    </None>
+    <ClInclude Include="..\shared\OOWebServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
