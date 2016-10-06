@@ -10,6 +10,7 @@ public:
     virtual bool canUpload(String uri) { return false; }
     virtual bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) { return false; }
     virtual void upload(ESP8266WebServer& server, String requestUri, HTTPUpload& upload) {}
+	virtual String uri() const { return ""; }
 
     RequestHandler* next() { return _next; }
     void next(RequestHandler* r) { _next = r; }

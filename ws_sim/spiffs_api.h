@@ -145,17 +145,17 @@ public:
     bool seek(uint32_t pos, SeekMode mode) override
     {
         long ret = _lseek(_fd, pos, mode);
-        return false;
+        return true;
     }
 
     size_t position() const override
     {
-        return 0;
+        return _tell(_fd);
     }
 
     size_t size() const override
     {
-        return 0;
+        return _filelength(_fd);
     }
 
     void close() override

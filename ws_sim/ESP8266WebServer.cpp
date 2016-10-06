@@ -30,6 +30,7 @@
 #include "Socket.h"
 
 #include <assert.h>
+#include <sstream>
 
 //#define DEBUG_ESP_HTTP_SERVER
 #ifdef DEBUG_ESP_PORT
@@ -316,8 +317,14 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
 
 void ESP8266WebServer::send(int code, const char* content_type, const String& content) {
     String header;
-    _prepareHeader(header, code, content_type, content.length());
-    sendContent(header);
+    //_prepareHeader(header, code, content_type, content.length());
+	std::stringstream ss;
+	ss << code;
+	_currentRequest->status_ = ss.str() + " " + _responseCodeToString(code).c_str();
+	_currentRequest->responseHeaders_ = _responseHeaders.c_str();
+	_responseHeaders = "";
+
+	//sendContent(header);
 
     sendContent(content);
 }

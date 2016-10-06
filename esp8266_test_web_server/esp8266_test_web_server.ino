@@ -1,121 +1,242 @@
 #include <ESP8266WiFi.h>
+#include <FS.h>
+#include <TimeLib.h>
 
 #include "OOWebServer.h"
 #include "wifi_station.h"
 
 
-
 class TestWebServer : public OOWebServer<TestWebServer>
 {
-public:
-	TestWebServer(IPAddress addr, int port) : OOWebServer(addr, port)
+	struct html_page_template
 	{
-		initHandlers();
+		html_page_template(String uri, String template_data) :
+			_next(NULL),
+			_uri(uri),
+			_template_data(template_data)
+		{
+
+		}
+		html_page_template *_next;
+		String _uri;
+		String _template_data;
+	};
+public:
+	TestWebServer(IPAddress addr, int port) : 
+		OOWebServer(addr, port),
+		_templates_base_dir("/web_templates"),
+		_page_template_list(NULL)
+	{
 	}
 
-	TestWebServer(int port) : OOWebServer(port)
+	TestWebServer(int port) :
+		OOWebServer(port),
+		_templates_base_dir("/web_templates"),
+		_page_template_list(NULL)
 	{
+	}
+
+	void begin()
+	{
+		OOWebServer<TestWebServer>::begin();
 		initHandlers();
 	}
 
 private:
 	void initHandlers()
 	{
+		Serial.println("initHandlers");
 		on("/", &TestWebServer::handleRoot);
-		on("/red", &TestWebServer::handleRed);
-		on("/blue", &TestWebServer::handleBlue);
-		on("/form", &TestWebServer::handleForm);
+		on("/time", HTTP_GET, &TestWebServer::handleTime);
+		on("/time", HTTP_POST, &TestWebServer::setTime);
+		on("/wifi_config", &TestWebServer::handleWiFiConfig);
+
+		loadPageTemplates();
+	}
+
+	void loadPageTemplates()
+	{
+		Serial.println("Loading templates...");
+		// Load HTML templates
+		for (RequestHandler* p = _firstHandler; p != NULL; p = p->next())
+		{
+			String uri = p->uri();
+
+			String templateName = "";
+			if (uri == "/")
+			{
+				templateName = "/index";
+			}
+			else
+			{
+				templateName = uri;
+			}
+
+			templateName += ".html";
+
+			LoadTemplate(uri, templateName);
+		}
+	}
+
+	void LoadTemplate(const String & uri, const String & templateName)
+	{
+		String template_fil_name = _templates_base_dir + templateName;
+		File template_file = SPIFFS.open(template_fil_name, "r");
+		if (template_file)
+		{
+			Serial.print("Successfully opened file '");
+			Serial.print(template_fil_name.c_str());
+			Serial.println("'\n");
+			size_t template_size = template_file.size();
+			char *template_contents = new char[template_size + 1];
+			if (template_contents)
+			{
+				template_file.readBytes(template_contents, template_size);
+				template_contents[template_size] = 0;
+
+				html_page_template *page_template = new html_page_template(uri, template_contents);
+				if (page_template)
+				{
+					if (_page_template_list)
+					{
+						page_template->_next = _page_template_list;
+					}
+
+					_page_template_list = page_template;
+				}
+			}
+
+			template_file.close();
+		}
+		else
+		{
+			Serial.print("Failed to open file '");
+			Serial.print(template_fil_name.c_str());
+			Serial.println("'\n");
+		}
+	}
+
+	String get_current_page_template() const
+	{
+		return get_page_template(_currentUri);
+	}
+
+	String get_page_template(const String & uri) const
+	{
+		html_page_template *page_template = _page_template_list;
+
+		for (html_page_template *page_template = _page_template_list; page_template != NULL; page_template = page_template->_next)
+		{
+			if (page_template->_uri == uri)
+			{
+				return page_template->_template_data;
+			}
+		}
+
+		return "";
+	}
+
+	String pad_string(const String & _str, size_t width, char fill_char)
+	{
+		String str = _str;
+		if (str.length() < width)
+		{
+			size_t fill_amount = width - str.length();
+			for (size_t i = 0; i < fill_amount; i++)
+			{
+				str = fill_char + str;
+			}
+		}
+
+		return str;
 	}
 
 	void handleRoot()
 	{
-		String title;
-		String body;
-		String bgcolor;
+		tmElements_t tm;
+		time_t tNow = now();
+		breakTime(tNow, tm);
+    
+		Serial.println("handleRoot");
+		String page_template = get_current_page_template();
 
-		bgcolor = "#ffffff";
-		title = "Web Server Example";
-		body = "<h1>Web Server Example</h1>"
-			"I wonder what you're going to click";
+		page_template.replace("<%hour%>", String(hourFormat12(tNow)));
+		page_template.replace("<%minute%>", pad_string(String(tm.Minute), 2, '0'));
+		page_template.replace("<%meridian%>", isAM(tNow) ? "am" : "pm");
 
-		send(200, "text/html", generate_page(title, bgcolor, body));
+		page_template.replace("<%day_of_week%>", dayShortStr(tm.Wday));
+		page_template.replace("<%day%>", String(tm.Day));
+		page_template.replace("<%month%>", monthShortStr(tm.Month));
+		page_template.replace("<%year%>", String(tmYearToCalendar(tm.Year)));
+
+		page_template.replace("<%inside_temperature%>", "73");
+		page_template.replace("<%inside_humidity%>", "43");
+
+		page_template.replace("<%outside_temperature%>", "83");
+		page_template.replace("<%outside_humidity%>", "53");
+
+		send(200, "text/html", page_template);
 	}
 
-	void handleRed()
+	void handleTime()
 	{
-		String title;
-		String body;
-		String bgcolor;
+		tmElements_t tm;
+		time_t tNow = now();
+		breakTime(tNow, tm);
 
-		bgcolor = "#ff4444";
-		title = "You chose red";
-		body = "<h1>Red</h1>";
+		String page_template = get_current_page_template();
 
-		send(200, "text/html", generate_page(title, bgcolor, body));
+		page_template.replace("<%hour%>", String(tm.Hour));
+		page_template.replace("<%minute%>", String(tm.Minute));
+
+		page_template.replace("<%day%>", String(tm.Day));
+		page_template.replace("<%month%>", String(tm.Month));
+		page_template.replace("<%year%>", String(tmYearToCalendar(tm.Year)));
+
+		send(200, "text/html", page_template);
 	}
 
-	void handleBlue()
+	void setTime()
 	{
-		String title;
-		String body;
-		String bgcolor;
-
-		bgcolor = "#4444ff";
-		title = "You chose blue";
-		body = "<h1>Blue</h1>";
-
-		send(200, "text/html", generate_page(title, bgcolor, body));
-	}
-
-	void handleForm()
-	{
-		String title;
-		String body;
-		String bgcolor;
-
-		title = "Fill a form";
-
-		body = "<h1>Fill a form</h1>";
-		body += "<form action='/form'>"
-			"<table>"
-			"<tr><td>Field 1</td><td><input name=field_1></td></tr>"
-			"<tr><td>Field 2</td><td><input name=field_2></td></tr>"
-			"<tr><td>Field 3</td><td><input name=field_3></td></tr>"
-			"</table>"
-			"<input type=submit></form>";
-
-
-		for (size_t i = 0; i < args(); i++)
+		if (hasArg("hour") && hasArg("minute") && hasArg("month") && hasArg("day") && hasArg("year"))
 		{
-			body += "<br>" + argName(i) + " = " + arg(i);
+			tmElements_t tm;
+
+			//Serial.printf("setTime: Setting date/time to %s/%s/%s %s:%s\n", arg("month").c_str(), arg("day").c_str(), arg("year").c_str(), arg("hour").c_str(), arg("minute").c_str());
+
+			tm.Hour = arg("hour").toInt();
+			tm.Minute = arg("minute").toInt();
+			tm.Second = 0;
+			tm.Month = arg("month").toInt();
+			tm.Day = arg("day").toInt();
+			int year = arg("year").toInt();
+			if (year < 100)
+			{
+				year += 2000;
+			}
+			tm.Year = year - 1970;
+
+			::setTime(makeTime(tm));
+		}
+		else
+		{
+			Serial.println("setTime: arguments missing");
 		}
 
-
-		body += "<hr>";
-
-		send(200, "text/html", generate_page(title, bgcolor, body));
+		sendHeader("Location", "/");
+		send(302, "", "/");
 	}
 
-	String generate_page(String title, String bgcolor, String body)
+	void handleWiFiConfig()
 	{
-		String links =
-			"<p><a href='/red'>red</a> "
-			"<br><a href='/blue'>blue</a> "
-			"<br><a href='/form'>form</a> "
-			"<br><a href='/auth'>authentication example</a> [use <b>adp</b> as username and <b>gmbh</b> as password"
-			"<br><a href='/header'>show some HTTP header details</a> "
-			;
+		String page_template = get_current_page_template();
 
-		String response;
-		response = "<html><head><title>";
-		response += title;
-		response += "</title></head><body bgcolor='" + bgcolor + "'>";
-		response += body;
-		response += links;
-		response += "</body></html>";
-
-		return response;
+		send(200, "text/html", page_template);
 	}
+
+private:
+	String _templates_base_dir;
+	html_page_template *_page_template_list;
 };
 
 TestWebServer server(8080);
@@ -124,11 +245,13 @@ TestWebServer server(8080);
 
 void setup()
 {
-	Serial.begin(115200);  // Serial connection from ESP-01 via 3.3v console cable
+  Serial.begin(115200);  // Serial connection from ESP-01 via 3.3v console cable
+	Serial.println("Sketch loaded...");
 
 	// Connect to WiFi network
 	connect_wifi("Caradhras", "Speak friend.", 120);
 
+	SPIFFS.begin();
 	server.begin();
 }
 

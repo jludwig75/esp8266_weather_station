@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Arduino.cpp" />
+    <ClCompile Include="DateStrings.cpp" />
     <ClCompile Include="ESP8266WebServer.cpp" />
     <ClCompile Include="FS.cpp" />
     <ClCompile Include="HardwareSerialSim.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="libb64\cencode.cpp" />
     <ClCompile Include="Print.cpp" />
     <ClCompile Include="spiffs_api.cpp" />
+    <ClCompile Include="TimeLib.cpp" />
     <ClCompile Include="WString.cpp" />
     <ClCompile Include="ws_sim.cpp" />
   </ItemGroup>
@@ -169,6 +171,8 @@
   <ItemGroup>
     <ClInclude Include="..\shared\OOWebServer.h" />
     <ClInclude Include="ESP8266WebServer.h" />
+    <ClInclude Include="Time.h" />
+    <ClInclude Include="TimeLib.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\esp8266_test_web_server\esp8266_test_web_server.ino">

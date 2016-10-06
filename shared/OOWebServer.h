@@ -46,6 +46,11 @@ public:
 			(*_handler_class.*_ufn)();
 	}
 
+	String uri() const
+	{
+		return _uri;
+	}
+
 protected:
 	_T *_handler_class;
 	HandlerMethod _fn;

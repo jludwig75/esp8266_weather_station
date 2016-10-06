@@ -46,12 +46,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\esp8266_test_web_server\esp8266_test_web_server.ino" />
+    <ClCompile Include="TimeLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DateStrings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ESP8266WebServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\OOWebServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

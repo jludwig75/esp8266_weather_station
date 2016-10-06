@@ -51,17 +51,23 @@ unsigned webserver::Request(void* ptr_s) {
 
   http_request req;
 
+  size_t methodLength = 0;
+
+  std::string firstLine = line.substr(0, line.length()-2);
+
   if (line.find("GET") == 0) {
     req.method_="GET";
+	methodLength = 3;
   }
   else if (line.find("POST") == 0) {
     req.method_="POST";
+	methodLength = 4;
   }
 
   std::string path;
   std::map<std::string, std::string> params;
 
-  size_t posStartPath = line.find_first_not_of(" ",3);
+  size_t posStartPath = line.find_first_not_of(" ", methodLength);
 
   SplitGetReq(line.substr(posStartPath), path, params);
 
@@ -75,6 +81,9 @@ unsigned webserver::Request(void* ptr_s) {
   static const std::string accept_language = "Accept-Language: "    ;
   static const std::string accept_encoding = "Accept-Encoding: "    ;
   static const std::string user_agent      = "User-Agent: "         ;
+  static const std::string content_length  = "Content-Length: ";
+
+  int contentLength = 0;
 
   while(1) {
     line=s.ReceiveLine();
@@ -108,6 +117,17 @@ unsigned webserver::Request(void* ptr_s) {
     else if (line.substr(0, user_agent.size()) == user_agent) {
       req.user_agent_ = line.substr(user_agent.size());
     }
+	else if (line.substr(0, content_length.size()) == content_length) {
+		contentLength = atoi(line.substr(content_length.size()).c_str());
+	}
+  }
+
+  if (req.method_ == "POST" && contentLength > 0)
+  {
+	  line = s.ReceiveBytes();
+	  line = req.method_ + " " + req.path_ + "?" + line;
+	  SplitGetReq(line.substr(posStartPath), path, params);
+	  req.params_ = params;
   }
 
   request_func_(&req);
@@ -140,6 +160,10 @@ unsigned webserver::Request(void* ptr_s) {
   s.SendLine("Connection: close");
   s.SendLine("Content-Type: text/html; charset=ISO-8859-1");
   s.SendLine("Content-Length: " + str_str.str());
+  if (!req.responseHeaders_.empty())
+  {
+	  s.SendBytes(req.responseHeaders_.c_str());
+  }
   s.SendLine("");
   s.SendLine(req.answer_);
 
