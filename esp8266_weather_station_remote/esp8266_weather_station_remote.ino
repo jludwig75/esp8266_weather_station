@@ -33,6 +33,7 @@ const unsigned long report_interval_ms = report_interval_minutes * 60 * 1000;   
  
 void connectWiFi(void)
 {
+    millis();
   // NOTE: Aparently this is crucial. Without this, I can connect to the web server
   // with my phone, but another ESP cannot. Just setting this fixes the problem.
   WiFi.mode(WIFI_STA);

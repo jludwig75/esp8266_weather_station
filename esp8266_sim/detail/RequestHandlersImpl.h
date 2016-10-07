@@ -43,10 +43,6 @@ public:
             _ufn();
     }
 
-	String uri() const override {
-		return _uri;
-	}
-
 protected:
     ESP8266WebServer::THandlerFunction _fn;
     ESP8266WebServer::THandlerFunction _ufn;
@@ -140,10 +136,6 @@ public:
         else if (path.endsWith(".appcache")) return "text/cache-manifest";
         return "application/octet-stream";
     }
-
-	String uri() const override {
-		return _uri;
-	}
 
 protected:
     FS _fs;
