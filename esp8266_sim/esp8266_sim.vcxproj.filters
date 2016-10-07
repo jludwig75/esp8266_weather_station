@@ -65,5 +65,11 @@
     <ClCompile Include="HardwareSerialSim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DHT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ticker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

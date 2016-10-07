@@ -157,12 +157,12 @@ void weather_station_base::update_local_sensor_data(bool update_now)
 	m_current_local_sensor_data.humidity = humidity;
 	m_current_local_sensor_data.temperature = temperature;
 
-	if (isnan(m_current_local_sensor_data.humidity))
+	if (m_current_local_sensor_data.humidity > 100)
 	{
 		Serial.println("Read bad humidity");
 	}
 
-	if (isnan(m_current_local_sensor_data.temperature))
+	if (m_current_local_sensor_data.temperature > 1000)
 	{
 		Serial.println("Read bad temperature");
 	}
