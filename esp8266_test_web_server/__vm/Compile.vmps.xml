@@ -12,46 +12,6 @@
       <BreakPoint Index="1" Name="sketch.cpp, line 110" Id="965a3cdc-ccaa-4fcb-9621-ccb300e09f36" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="e:\code\esp8266_weather_station\ws_sim\sketch.cpp" FileLine="110" FileColumn="1" FunctionName="" FunctionLineOffset="1" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="" LocationType="3" Tag="&lt;vmbp Id='965a3cdc-ccaa-4fcb-9621-ccb300e09f36'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1" />
       <BreakPoint Index="2" Name="sketch.cpp, line 109" Id="4ad0dbaf-53f9-4915-956c-e26fdf06308f" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="e:\code\esp8266_weather_station\ws_sim\sketch.cpp" FileLine="109" FileColumn="1" FunctionName="" FunctionLineOffset="1" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="" LocationType="3" Tag="&lt;vmbp Id='4ad0dbaf-53f9-4915-956c-e26fdf06308f'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1" />
       <BreakPoint Index="3" Name="spiffs_api.h, line 125" Id="118efc2d-c45c-459f-9c6e-7f676e44e91d" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="e:\code\esp8266_weather_station\ws_sim\spiffs_api.h" FileLine="125" FileColumn="1" FunctionName="" FunctionLineOffset="1" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="" LocationType="3" Tag="&lt;vmbp Id='118efc2d-c45c-459f-9c6e-7f676e44e91d'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1" />
-      <BreakPoint Index="4" Name="webserver.cpp, line 133" Id="cd31754c-7781-47ab-bb56-f02b9b4cf0b7" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="e:\code\esp8266_weather_station\simple_web_server\webserver.cpp" FileLine="133" FileColumn="1" FunctionName="Request(void* ptr_s)" FunctionLineOffset="90" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='cd31754c-7781-47ab-bb56-f02b9b4cf0b7'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
-        <Source>126	  {
-127		  line = s.ReceiveBytes();
-128		  line = req.method_ + " " + req.path_ + "?" + line;
-129		  SplitGetReq(line.substr(posStartPath), path, params);
-130		  req.params_ = params;
-131	  }
-132	
---&gt;133	  request_func_(&amp;req);
-134	
-135	  std::stringstream str_str;
-136	  str_str &lt;&lt; req.answer_.size();
-137	
-138	  time_t ltime;
-139	  time(&amp;ltime);
-140	  tm* gmt= gmtime(&amp;ltime);
-141	
-142	  static std::string const serverName = "RenesWebserver (Windows)";
-</Source>
-      </BreakPoint>
-      <BreakPoint Index="5" Name="esp8266_test_web_server.ino, line 50" Id="786e686b-0086-4467-90cb-43ff9ad09aeb" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="e:\code\esp8266_weather_station\esp8266_test_web_server\esp8266_test_web_server.ino" FileLine="50" FileColumn="1" FunctionName="class TestWebServer::handleRoot()" FunctionLineOffset="3" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='786e686b-0086-4467-90cb-43ff9ad09aeb'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
-        <Source>43	
-44			return str;
-45		}
-46	
-47		void handleRoot()
-48		{
-49			tmElements_t tm;
---&gt;50			time_t tNow = now();
-51			breakTime(tNow, tm);
-52	    
-53			Serial.println("handleRoot");
-54			String page_template = get_current_page_template();
-55	
-56			page_template.replace("&lt;%hour%&gt;", String(hourFormat12(tNow)));
-57			page_template.replace("&lt;%minute%&gt;", pad_string(String(tm.Minute), 2, '0'));
-58			page_template.replace("&lt;%meridian%&gt;", isAM(tNow) ? "am" : "pm");
-59	
-</Source>
-      </BreakPoint>
     </BreakPoints>
   </Program>
 </VisualMicro>

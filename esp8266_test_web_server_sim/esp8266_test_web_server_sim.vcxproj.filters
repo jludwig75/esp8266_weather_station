@@ -16,5 +16,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\esp8266_test_web_server\esp8266_test_web_server.ino" />
+    <ClCompile Include="init_sim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

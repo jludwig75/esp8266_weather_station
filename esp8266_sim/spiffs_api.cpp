@@ -31,7 +31,10 @@
 using namespace fs;
 using namespace std;
 
-const string spiffs_root = "spiffs_fs";
+
+extern string get_spiffs_root_dir();
+
+const string spiffs_root = get_spiffs_root_dir();
 
 
 static int convert_open_flags(OpenMode openMode, AccessMode accessMode)
@@ -70,7 +73,7 @@ static int convert_open_flags(OpenMode openMode, AccessMode accessMode)
 
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
 {
-    string file_name = spiffs_root + "/" + path;
+    string file_name = spiffs_root + path;
 
     int fd = _open(file_name.c_str(), convert_open_flags(openMode, accessMode), _S_IREAD | _S_IWRITE);
     if (fd == -1)
