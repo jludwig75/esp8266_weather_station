@@ -43,9 +43,10 @@ void HardwareSerial::flush(void)
 {
 
 }
-size_t HardwareSerial::write(uint8_t)
+size_t HardwareSerial::write(uint8_t c)
 {
-	return 0;
+	putc(c, stdout);
+	return 1;
 }
 void HardwareSerial::_rx_complete_irq(void)
 {

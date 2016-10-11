@@ -21,11 +21,20 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <thread>
+#include <chrono>
 
 #include "Ticker.h"
 
+using namespace std;
+
 Ticker::Ticker()
-: _timer(0)
+: _timer(0),
+_milliseconds(0),
+_repeat(false),
+_callback(NULL),
+_arg(0),
+_stop_timer_thread(false)
 {
 }
 
@@ -34,10 +43,35 @@ Ticker::~Ticker()
 	detach();
 }
 
+void Ticker::launch_timer(Ticker *_this)
+{
+	_this->run_timer();
+}
+
+void Ticker::run_timer()
+{
+	bool repeat = _repeat;
+	do
+	{
+		this_thread::sleep_for(chrono::milliseconds(1000));
+		_callback(reinterpret_cast<void*>(_arg));
+	} while (repeat && !_stop_timer_thread);
+}
+
+
 void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg)
 {
+	_milliseconds = milliseconds;
+	_repeat = repeat;
+	_callback = callback;
+	_arg = arg;
+
+	_thread = new thread(launch_timer, this);
 }
 
 void Ticker::detach()
 {
+	_stop_timer_thread = true;
+	_thread->join();
+	delete _thread;
 }

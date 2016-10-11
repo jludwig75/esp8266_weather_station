@@ -12,6 +12,11 @@
 #define UDP_LISTEN_PORT                 8888
 
 
+const int timeZone = -6;     // Mountain Daylight Time
+							 //const int timeZone = -5;  // Eastern Standard Time (USA)
+							 //const int timeZone = -4;  // Eastern Daylight Time (USA)
+							 //const int timeZone = -8;  // Pacific Standard Time (USA)
+							 //const int timeZone = -7;  // Pacific Daylight Time (USA)
 
 weather_station_base *weather_station_base::_this = NULL;
 
@@ -29,7 +34,11 @@ void reset()
 // higher the value.  The default for a 16mhz AVR is a value of 6.  For an
 // Arduino Due that runs at 84mhz a value of 30 works.
 // This is for the ESP8266 processor on ESP-01 
-weather_station_base::weather_station_base(const char *host_ssid, const char *host_password, uint8_t dht_pin, uint8_t dht_type) : m_wifi_connected(false), m_dht(dht_pin, dht_type, 11), m_server(TEMP_REPORT_SERVER_LISTEN_PORT), // 11 works fine for ESP8266
+weather_station_base::weather_station_base(const char *host_ssid, const char *host_password, uint8_t dht_pin, uint8_t dht_type) :
+	m_wifi_connected(false),
+	m_dht(dht_pin, dht_type, 11),
+	m_server(TEMP_REPORT_SERVER_LISTEN_PORT), // 11 works fine for ESP8266
+	m_ntp_client(timeZone),
 	m_last_time_update(millis()),
 	m_last_local_sensor_update(millis()),
 	m_host_ssid(host_ssid),
@@ -77,8 +86,10 @@ void weather_station_base::init()
 
 void weather_station_base::handle_root()
 {
-	String display = m_last_display_data.get_date_string() + " " + m_last_display_data.get_time_string() + " In: " + m_last_display_data.get_local_sensor_string() + " Out: " + m_last_display_data.get_remote_sensor_string();
-	m_server.send(200, "text/html", display);
+	String head = "<html>\n\t<head>\n\t\t<meta http-equiv=\"refresh\" content=\"5\">\n\t</head>\n\t<body>\n";
+	String display = m_last_display_data.get_date_string() + " " + m_last_display_data.get_time_string() + "<br/>In: " + m_last_display_data.get_local_sensor_string() + "<br/>Out: " + m_last_display_data.get_remote_sensor_string();
+	String tail = "\n\t</body>\n</html>";
+	m_server.send(200, "text/html", head + display + tail);
 }
 
 void weather_station_base::handle_sensor_data_post()

@@ -119,12 +119,18 @@ unsigned webserver::Request(void* ptr_s) {
     }
 	else if (line.substr(0, content_length.size()) == content_length) {
 		contentLength = atoi(line.substr(content_length.size()).c_str());
+		printf("Content-Length: %d\n", contentLength);
 	}
   }
 
   if (req.method_ == "POST" && contentLength > 0)
   {
-	  line = s.ReceiveBytes();
+	  line = "";
+	  while (line.length() < contentLength)
+	  {
+		  line += s.ReceiveBytes();
+	  }
+	  printf("Content body: \"%s\"\n", line.c_str());
 	  line = req.method_ + " " + req.path_ + "?" + line;
 	  SplitGetReq(line.substr(posStartPath), path, params);
 	  req.params_ = params;

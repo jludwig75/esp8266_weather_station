@@ -31,30 +31,6 @@ DHT dht(DHTPIN, DHTTYPE, 11); // 11 works fine for ESP8266
 const unsigned int report_interval_minutes = 5;
 const unsigned long report_interval_ms = report_interval_minutes * 60 * 1000;              // interval at which to read sensor in ms
  
-void connectWiFi(void)
-{
-    millis();
-  // NOTE: Aparently this is crucial. Without this, I can connect to the web server
-  // with my phone, but another ESP cannot. Just setting this fixes the problem.
-  WiFi.mode(WIFI_STA);
-  
-  // Connect to WiFi network
-  WiFi.begin(ap_ssid, ap_password);
-  Serial.print("\n\r \n\rWorking to connect");
-
-  // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("DHT Weather Reporting Client");
-  Serial.print("Connected to ");
-  Serial.println(ap_ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-}
-
 void sendSensorData(const char *server, float temperature, float humidity)
 {
   WiFiClient client;

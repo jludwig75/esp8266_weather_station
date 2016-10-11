@@ -25,6 +25,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
+namespace std
+{
+	class thread;
+}
+
 extern "C" {
 	typedef struct _ETSTIMER_ ETSTimer;
 }
@@ -97,9 +102,19 @@ public:
 protected:	
 	void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg);
 
+	static void launch_timer(Ticker *_this);
+	void run_timer();
+
 
 protected:
 	ETSTimer* _timer;
+
+	uint32_t _milliseconds;
+	bool _repeat;
+	callback_with_arg_t _callback;
+	uint32_t _arg;
+	bool _stop_timer_thread;
+	std::thread *_thread;
 };
 
 

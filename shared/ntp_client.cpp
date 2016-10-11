@@ -11,13 +11,7 @@ static const char ntpServerName[] = "us.pool.ntp.org";
 //static const char ntpServerName[] = "time-b.timefreq.bldrdoc.gov";
 //static const char ntpServerName[] = "time-c.timefreq.bldrdoc.gov";
 
-const int timeZone = -6;     // Central European Time
-							 //const int timeZone = -5;  // Eastern Standard Time (USA)
-							 //const int timeZone = -4;  // Eastern Daylight Time (USA)
-							 //const int timeZone = -8;  // Pacific Standard Time (USA)
-							 //const int timeZone = -7;  // Pacific Daylight Time (USA)
-
-NtpClient::NtpClient() : m_udp(NULL)
+NtpClient::NtpClient(int tz_adjust_hours) : m_udp(NULL), _tz_adjust_hours(tz_adjust_hours)
 {
 }
 
@@ -35,11 +29,11 @@ void NtpClient::begin(uint16_t udp_listen_port)
 	Serial.println(m_udp->localPort());
 }
 
-time_t getNtpTime(WiFiUDP & udp);
+time_t getNtpTime(WiFiUDP & udp, int tz_adjust_hours);
 
 time_t NtpClient::get_time() const
 {
-	return getNtpTime((WiFiUDP &)*m_udp);
+	return getNtpTime((WiFiUDP &)*m_udp, _tz_adjust_hours);
 }
 
 /*-------- NTP code ----------*/
@@ -49,7 +43,7 @@ byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming & outgoing packets
 
 void sendNTPpacket(WiFiUDP & udp, IPAddress &address);
 
-time_t getNtpTime(WiFiUDP & udp)
+time_t getNtpTime(WiFiUDP & udp, int tz_adjust_hours)
 {
 	IPAddress ntpServerIP; // NTP server's ip address
 
@@ -73,7 +67,7 @@ time_t getNtpTime(WiFiUDP & udp)
 			secsSince1900 |= (unsigned long)packetBuffer[41] << 16;
 			secsSince1900 |= (unsigned long)packetBuffer[42] << 8;
 			secsSince1900 |= (unsigned long)packetBuffer[43];
-			return secsSince1900 - 2208988800UL + timeZone * SECS_PER_HOUR;
+			return secsSince1900 - 2208988800UL + tz_adjust_hours * SECS_PER_HOUR;
 		}
 	}
 	Serial.println("No NTP Response :-(");
