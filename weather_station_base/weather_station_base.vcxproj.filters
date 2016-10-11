@@ -21,9 +21,6 @@
     <ClInclude Include="__vm\.weather_station_base.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wifi_ap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sensor_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -42,11 +39,11 @@
     <ClInclude Include="..\shared\ntp_client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\shared\wifi_ap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="wifi_ap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="sensor_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,6 +57,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\ntp_client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\wifi_ap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

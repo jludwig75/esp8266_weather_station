@@ -13,7 +13,7 @@ String time_string(const tmElements_t & tm)
 
 String date_string(const tmElements_t & tm)
 {
-	return pad_int(tm.Month, 2, ' ') + "/" + pad_int(tm.Day, 2, ' ') + "/" + tm.Year;
+	return pad_int(tm.Month, 2, ' ') + "/" + pad_int(tm.Day, 2, ' ') + "/" + (tm.Year + 1970);
 }
 
 bool display_data::changed(const sensor_data & new_local_sensor_data, const sensor_data & new_remote_sensor_data, time_t new_time) const

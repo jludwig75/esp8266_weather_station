@@ -5,6 +5,11 @@ extern "C" void yield()
     Sleep(10);
 }
 
+extern "C" void delay(unsigned long miliseconds)
+{
+	Sleep(miliseconds);
+}
+
 extern "C" unsigned long millis()
 {
     return GetTickCount();
