@@ -28,5 +28,5 @@ String sensor_data::to_string() const
 	{
 		humidity_string = String(humidity);
 	}
-	return temp_string + "\xA7" "F " + humidity_string + "%";
+	return temp_string + "\xB0" "F " + humidity_string + "%";
 }
