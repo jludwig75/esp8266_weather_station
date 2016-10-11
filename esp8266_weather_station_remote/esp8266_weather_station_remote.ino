@@ -78,11 +78,15 @@ void setup(void)
   Serial.println("Temperature: " + String((int)temp_f) + ", Humidity: " + String((int)humidity));
 
   // Connect to WiFi network
-  connect_wifi(ap_ssid, ap_password, 120);
-
-  Serial.println("Sending sensor data to server...");
-  sendSensorData(report_server, temp_f, humidity);
-
+  if (connect_wifi(ap_ssid, ap_password, 40))
+  {
+	  Serial.println("Sending sensor data to server...");
+	  sendSensorData(report_server, temp_f, humidity);
+  }
+  else
+  {
+	  Serial.printf("Failed to connect to AP '%s'\n", ap_ssid);
+  }
   Serial.println("Sleeping...");
   ESP.deepSleep(report_interval_ms * 1000);
 }
