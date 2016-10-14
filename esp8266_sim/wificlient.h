@@ -104,10 +104,10 @@ public:
 
 protected:
 
-  static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
+  //static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
   static void _s_err(void* arg, int8_t err);
 
-  int8_t _connected(void* tpcb, int8_t err);
+  //int8_t _connected(void* tpcb, int8_t err);
   void _err(int8_t err);
 
   ClientContext* _client;

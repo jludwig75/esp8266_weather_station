@@ -25,27 +25,163 @@
 extern "C"
 {
     #include "include/wl_definitions.h"
-    #include "osapi.h"
-    #include "ets_sys.h"
+    //#include "osapi.h"
+    //#include "ets_sys.h"
 }
 
-#include "debug.h"
+enum tcp_state {
+    CLOSED = 0,
+    LISTEN = 1,
+    SYN_SENT = 2,
+    SYN_RCVD = 3,
+    ESTABLISHED = 4,
+    FIN_WAIT_1 = 5,
+    FIN_WAIT_2 = 6,
+    CLOSE_WAIT = 7,
+    CLOSING = 8,
+    LAST_ACK = 9,
+    TIME_WAIT = 10
+};
+
+//#include "debug.h"
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"
 #include "WiFiServer.h"
-#include "lwip/opt.h"
-#include "lwip/ip.h"
-#include "lwip/tcp.h"
-#include "lwip/inet.h"
-#include "lwip/netif.h"
-#include "include/ClientContext.h"
-#include "c_types.h"
+//#include "lwip/opt.h"
+//#include "lwip/ip.h"
+//#include "lwip/tcp.h"
+//#include "lwip/inet.h"
+//#include "lwip/netif.h"
+//#include "include/ClientContext.h"
+//#include "c_types.h"
+
+#include <assert.h>
+#include <WinSock2.h>
+#include <ws2tcpip.h>
 
 uint16_t WiFiClient::_localPort = 0;
 
 template<>
 WiFiClient* SList<WiFiClient>::_s_first = 0;
 
+class ClientContext
+{
+public:
+    ClientContext(SOCKET s) : _ref(1), _socket(s)
+    {
+
+    }
+    void ref()
+    {
+        _ref++;
+    }
+    void unref()
+    {
+        assert(_ref > 0);
+        _ref--;
+        if (_ref == 0)
+        {
+            delete this;
+        }
+    }
+
+    tcp_state state() const
+    {
+        return CLOSED;
+    }
+    int getSize() const
+    {
+        assert(0); // TODO
+        return 0;
+    }
+    int peek()
+    {
+        assert(0); // TODO
+        return 0;
+    }
+    size_t peekBytes(uint8_t *buffer, size_t length)
+    {
+        assert(0); // TODO
+        return 0;
+    }
+    int read()
+    {
+        char buf[1];
+        int ret = recv(_socket, buf, 1, 0);
+        if (SOCKET_ERROR == ret)
+        {
+            return 0;
+        }
+
+        return ret;
+    }
+    int read(uint8_t *buf, size_t size)
+    {
+        int ret = recv(_socket, (char *)buf, size, 0);
+        if (SOCKET_ERROR == ret)
+        {
+            return 0;
+        }
+
+        return ret;
+    }
+    size_t write(uint8_t data)
+    {
+        int ret = send(_socket, (const char *)&data, 1, 0);
+        if (SOCKET_ERROR == ret)
+        {
+            return 0;
+        }
+
+        return ret;
+    }
+    size_t write(const uint8_t *buf, size_t size)
+    {
+        int ret = send(_socket, (const char *)buf, size, 0);
+        if (SOCKET_ERROR == ret)
+        {
+            return 0;
+        }
+
+        return ret;
+    }
+    void flush()
+    {
+
+    }
+    void abort()
+    {
+
+    }
+    IPAddress getRemoteAddress() const
+    {
+        return IPAddress();
+    }
+    uint16_t getRemotePort() const
+    {
+        return 0;
+    }
+    IPAddress getLocalAddress() const
+    {
+        return IPAddress();
+    }
+    uint16_t getLocalPort() const
+    {
+        return 0;
+    }
+    void setNoDelay(bool)
+    {
+
+    }
+    bool getNoDelay() const
+    {
+        return false;
+    }
+private:
+
+    int _ref;
+    int _socket;
+};
 
 WiFiClient::WiFiClient()
 : _client(0)
@@ -88,64 +224,84 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 int WiFiClient::connect(const char* host, uint16_t port)
 {
     IPAddress remote_addr;
-    if (WiFi.hostByName(host, remote_addr))
+    struct addrinfo hints;
+    struct addrinfo *result = NULL;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    INT ret = getaddrinfo(host, NULL, NULL, &result);
+    if (ret != 0)
     {
-        return connect(remote_addr, port);
+        return ret;
     }
-    return 0;
+
+    assert(result->ai_family == AF_INET);
+
+    struct sockaddr_in  *sockaddr_ipv4;
+    sockaddr_ipv4 = (struct sockaddr_in *) result->ai_addr;
+
+    remote_addr = IPAddress(sockaddr_ipv4->sin_addr.S_un.S_un_b.s_b1,
+        sockaddr_ipv4->sin_addr.S_un.S_un_b.s_b2,
+        sockaddr_ipv4->sin_addr.S_un.S_un_b.s_b3,
+        sockaddr_ipv4->sin_addr.S_un.S_un_b.s_b4);
+    freeaddrinfo(result);
+
+    return connect(remote_addr, port);
 }
 
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
-    ip_addr_t addr;
-    addr.addr = ip;
-
     if (_client)
         stop();
 
-    // if the default interface is down, tcp_connect exits early without
-    // ever calling tcp_err
-    // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
-    netif* interface = ip_route(&addr);
-    if (!interface) {
-        DEBUGV("no route to host\r\n");
-        return 0;
+    sockaddr_in clientService;
+    clientService.sin_family = AF_INET;
+    clientService.sin_addr.S_un.S_un_b.s_b1 = ip[0];
+    clientService.sin_addr.S_un.S_un_b.s_b2 = ip[1];
+    clientService.sin_addr.S_un.S_un_b.s_b3 = ip[2];
+    clientService.sin_addr.S_un.S_un_b.s_b4 = ip[3];
+    clientService.sin_port = htons(port);
+
+    SOCKET s;
+    s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (INVALID_SOCKET == s)
+    {
+        return WSAGetLastError();
     }
 
-    tcp_pcb* pcb = tcp_new();
-    if (!pcb)
-        return 0;
-
-    if (_localPort > 0) {
-        pcb->local_port = _localPort++;
+    int ret = ::connect(s, (SOCKADDR *)&clientService, sizeof(clientService));
+    if (ret != 0)
+    {
+        return WSAGetLastError();
     }
 
-    tcp_arg(pcb, this);
-    tcp_err(pcb, &WiFiClient::_s_err);
-    tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
+    _client = new ClientContext(s);
 
-    esp_yield();
     if (_client)
+    {
         return 1;
+    }
 
-    //  if tcp_error was called, pcb has already been destroyed.
-    // tcp_abort(pcb);
+    closesocket(s);
     return 0;
 }
 
-int8_t WiFiClient::_connected(void* pcb, int8_t err)
-{
-    tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
-    _client = new ClientContext(tpcb, 0, 0);
-    _client->ref();
-    esp_schedule();
-    return ERR_OK;
-}
+//int8_t WiFiClient::_connected(void* pcb, int8_t err)
+//{
+//    tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
+//    _client = new ClientContext(tpcb, 0, 0);
+//    _client->ref();
+//    esp_schedule();
+//    return ERR_OK;
+//}
 
 void WiFiClient::_err(int8_t err)
 {
-    DEBUGV(":err %d\r\n", err);
-    esp_schedule();
+    //DEBUGV(":err %d\r\n", err);
+    //esp_schedule();
 }
 
 
@@ -173,7 +329,7 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
         return 0;
     }
 
-    return _client->write(reinterpret_cast<const char*>(buf), size);
+    return _client->write(buf, size);
 }
 
 size_t WiFiClient::write_P(PGM_P buf, size_t size)
@@ -198,7 +354,7 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
         remaining_size -= chunkUnitLen;
 
         // write is so overloaded, had to use the cast to get it pick the right one
-        _client->write((const char*)chunkUnit, chunkUnitLen);
+        _client->write((const uint8_t*)chunkUnit, chunkUnitLen);
     }
     return size;
 }
@@ -210,9 +366,9 @@ int WiFiClient::available()
 
     int result = _client->getSize();
 
-    if (!result) {
-        optimistic_yield(100);
-    }
+    //if (!result) {
+    //    optimistic_yield(100);
+    //}
     return result;
 }
 
@@ -227,7 +383,7 @@ int WiFiClient::read()
 
 int WiFiClient::read(uint8_t* buf, size_t size)
 {
-    return (int) _client->read(reinterpret_cast<char*>(buf), size);
+    return (int) _client->read(buf, size);
 }
 
 int WiFiClient::peek()
@@ -256,7 +412,7 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
         count = length;
     }
 
-    return _client->peekBytes((char *)buffer, count);
+    return _client->peekBytes(buffer, count);
 }
 
 void WiFiClient::flush()
@@ -326,10 +482,10 @@ uint16_t WiFiClient::localPort()
     return _client->getLocalPort();
 }
 
-int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
-{
-    return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);
-}
+//int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
+//{
+//    return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);
+//}
 
 void WiFiClient::_s_err(void* arg, int8_t err)
 {

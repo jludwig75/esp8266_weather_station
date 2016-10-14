@@ -71,5 +71,11 @@
     <ClCompile Include="Ticker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Esp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WiFiClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

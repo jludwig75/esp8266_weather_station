@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "esp8266_test_web_server_sim
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "weather_station_base_sim", "weather_station_base_sim\weather_station_base_sim.vcxproj", "{A96BA046-E953-4F90-8480-4E3202807804}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "esp8266_weather_station_remote_sim", "esp8266_weather_station_remote_sim\esp8266_weather_station_remote_sim.vcxproj", "{EB81CA75-9EDA-48F1-88CE-05AA25D9ED3E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -75,6 +77,14 @@ Global
 		{A96BA046-E953-4F90-8480-4E3202807804}.Release|x64.Build.0 = Release|x64
 		{A96BA046-E953-4F90-8480-4E3202807804}.Release|x86.ActiveCfg = Release|Win32
 		{A96BA046-E953-4F90-8480-4E3202807804}.Release|x86.Build.0 = Release|Win32
+		{EB81CA75-9EDA-48F1-88CE-05AA25D9ED3E}.Debug|x64.ActiveCfg = Debug|x64
+		{EB81CA75-9EDA-48F1-88CE-05AA25D9ED3E}.Debug|x64.Build.0 = Debug|x64
+		{EB81CA75-9EDA-48F1-88CE-05AA25D9ED3E}.Debug|x86.ActiveCfg = Debug|Win32
+		{EB81CA75-9EDA-48F1-88CE-05AA25D9ED3E}.Debug|x86.Build.0 = Debug|Win32
+		{EB81CA75-9EDA-48F1-88CE-05AA25D9ED3E}.Release|x64.ActiveCfg = Release|x64
+		{EB81CA75-9EDA-48F1-88CE-05AA25D9ED3E}.Release|x64.Build.0 = Release|x64
+		{EB81CA75-9EDA-48F1-88CE-05AA25D9ED3E}.Release|x86.ActiveCfg = Release|Win32
+		{EB81CA75-9EDA-48F1-88CE-05AA25D9ED3E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

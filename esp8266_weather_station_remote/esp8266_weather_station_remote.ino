@@ -15,7 +15,8 @@
 
 // Data shared between client and server:
 
-const char *report_server = "192.168.4.1";
+//const char *report_server = "192.168.4.1";
+const char *report_server = "127.0.0.1";
 
 
 // Initialize DHT sensor 
@@ -38,7 +39,11 @@ void sendSensorData(const char *server, float temperature, float humidity)
   String postData = String("station_id=2&") + temp_var_name + "=" + String((int)temperature) + "&" + humidity_var_name + "=" + String((int)humidity);
   
   // If there's a successful connection, send the HTTP POST request
-  Serial.printf("connecting to %s on port %u...\n", server, TEMP_REPORT_SERVER_LISTEN_PORT);
+  Serial.print("connecting to ");
+  Serial.print(server);
+  Serial.print(" on port ");
+  Serial.print(TEMP_REPORT_SERVER_LISTEN_PORT);
+  Serial.println("...");
   if (client.connect(server, TEMP_REPORT_SERVER_LISTEN_PORT))
   {
     Serial.println("connected to server");
@@ -85,7 +90,9 @@ void setup(void)
   }
   else
   {
-	  Serial.printf("Failed to connect to AP '%s'\n", ap_ssid);
+	  Serial.print("Failed to connect to AP '");
+      Serial.print(ap_ssid);
+      Serial.println("'");
   }
   Serial.println("Sleeping...");
   ESP.deepSleep(report_interval_ms * 1000);
