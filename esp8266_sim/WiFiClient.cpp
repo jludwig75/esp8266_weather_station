@@ -106,6 +106,7 @@ public:
     }
     int read()
     {
+        assert(0); // TODO
         char buf[1];
         int ret = recv(_socket, buf, 1, 0);
         if (SOCKET_ERROR == ret)
@@ -113,7 +114,7 @@ public:
             return 0;
         }
 
-        return ret;
+        return buf[0];
     }
     int read(uint8_t *buf, size_t size)
     {
