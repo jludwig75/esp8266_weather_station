@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "weather_station_base", "weather_station_base\weather_station_base.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
@@ -29,13 +29,11 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x64.ActiveCfg = Debug|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.ActiveCfg = Debug|Win32
-		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x64.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
 		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
 		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Debug|x64.ActiveCfg = Debug|Win32
 		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Debug|x86.ActiveCfg = Debug|Win32
-		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Debug|x86.Build.0 = Debug|Win32
 		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Release|x64.ActiveCfg = Release|Win32
 		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Release|x86.ActiveCfg = Release|Win32
 		{ECC6FA14-7C84-4662-B533-608AA1CD9669}.Release|x86.Build.0 = Release|Win32
@@ -49,7 +47,6 @@ Global
 		{F3BC6A40-8C85-41C6-BAE0-4AD72586BC82}.Release|x86.Build.0 = Release|Win32
 		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Debug|x64.ActiveCfg = Debug|Win32
 		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Debug|x86.ActiveCfg = Debug|Win32
-		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Debug|x86.Build.0 = Debug|Win32
 		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Release|x64.ActiveCfg = Release|Win32
 		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Release|x86.ActiveCfg = Release|Win32
 		{EC621764-9D9C-4025-AF43-AD52BB67A54F}.Release|x86.Build.0 = Release|Win32
