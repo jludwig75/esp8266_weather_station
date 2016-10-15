@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ESP8266WebServer.h>
+#include <FS.h>
 
 
 template<typename _T>

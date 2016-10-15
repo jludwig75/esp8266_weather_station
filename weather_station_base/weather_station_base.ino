@@ -16,16 +16,16 @@ const char* host_ssid            = "Caradhras";
 const char* host_password        = "Speak friend.";
 
 
-weather_station_base g_weather_station_base(host_ssid, host_password, DHTPIN, DHTTYPE);
+WeatherStationBase g_weather_station_base(host_ssid, host_password, DHTPIN, DHTTYPE);
 
 
 void setup()
 {
-  Serial.begin(115200);
-  g_weather_station_base.init();
+	Serial.begin(115200);
+	g_weather_station_base.begin();
 }
 
 void loop()
 {
-  g_weather_station_base.on_loop();
+	g_weather_station_base.on_loop();
 }

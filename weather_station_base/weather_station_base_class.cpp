@@ -18,8 +18,6 @@ const int timeZone = -6;     // Mountain Daylight Time
 							 //const int timeZone = -8;  // Pacific Standard Time (USA)
 							 //const int timeZone = -7;  // Pacific Daylight Time (USA)
 
-weather_station_base *weather_station_base::_this = NULL;
-
 void reset()
 {
 	// TODO: send reset in GPIO 16
@@ -34,20 +32,19 @@ void reset()
 // higher the value.  The default for a 16mhz AVR is a value of 6.  For an
 // Arduino Due that runs at 84mhz a value of 30 works.
 // This is for the ESP8266 processor on ESP-01 
-weather_station_base::weather_station_base(const char *host_ssid, const char *host_password, uint8_t dht_pin, uint8_t dht_type) :
+WeatherStationBase::WeatherStationBase(const char *host_ssid, const char *host_password, uint8_t dht_pin, uint8_t dht_type) :
+	OOWebServer<WeatherStationBase>("/web_templates", TEMP_REPORT_SERVER_LISTEN_PORT),
 	m_wifi_connected(false),
-	m_dht(dht_pin, dht_type, 11),
-	m_server(TEMP_REPORT_SERVER_LISTEN_PORT), // 11 works fine for ESP8266
+	m_dht(dht_pin, dht_type, 11), // 11 works fine for ESP8266
 	m_ntp_client(timeZone),
 	m_last_time_update(millis()),
 	m_last_local_sensor_update(millis()),
 	m_host_ssid(host_ssid),
 	m_host_password(host_password)
 {
-	_this = this;
 }
 // setup() methods
-void weather_station_base::init()
+void WeatherStationBase::server_begin()
 {
 	m_dht.begin();
 	if (!start_access_point(ap_ssid, ap_password))
@@ -63,10 +60,11 @@ void weather_station_base::init()
 	}
 
 	Serial.println("Starting web server...\n");
-	m_server.on(report_url, HTTP_POST, sensor_data_post_handler);
-	m_server.on("/", root_handler);
-	m_server.begin();
-	Serial.println("Web server started.\n");
+	on(report_url, HTTP_POST, &WeatherStationBase::handle_sensor_data_post);
+	on("/", &WeatherStationBase::handle_root);
+	on("/time", HTTP_GET, &WeatherStationBase::handleTime);
+	on("/time", HTTP_POST, &WeatherStationBase::setTime);
+	on("/wifi_config", &WeatherStationBase::handleWiFiConfig);
 
 	Serial.println("Starting NTP client...");
 	m_ntp_client.begin();
@@ -84,51 +82,144 @@ void weather_station_base::init()
 	m_display_timer.attach_ms(DISPLAY_UPDATE_INTERVAL_MS, update_display_timer_func, this);
 }
 
-void weather_station_base::handle_root()
+static String pad_string(const String & _str, size_t width, char fill_char)
 {
-	String head = "<html>\n\t<head>\n\t\t<meta http-equiv=\"refresh\" content=\"5\">\n\t</head>\n\t<body>\n";
-	String display = m_last_display_data.get_date_string() + " " + m_last_display_data.get_time_string() + "<br/>In: " + m_last_display_data.get_local_sensor_string() + "<br/>Out: " + m_last_display_data.get_remote_sensor_string();
-	String tail = "\n\t</body>\n</html>";
-	m_server.send(200, "text/html", head + display + tail);
+	String str = _str;
+	if (str.length() < width)
+	{
+		size_t fill_amount = width - str.length();
+		for (size_t i = 0; i < fill_amount; i++)
+		{
+			str = fill_char + str;
+		}
+	}
+
+	return str;
 }
 
-void weather_station_base::handle_sensor_data_post()
+void WeatherStationBase::handle_root()
+{
+	String page_template = get_current_page_template();
+
+	m_last_display_data.time;
+	tmElements_t tm;
+	breakTime(m_last_display_data.time, tm);
+
+	page_template.replace("<%hour%>", String(hourFormat12(m_last_display_data.time)));
+	page_template.replace("<%minute%>", pad_string(String(tm.Minute), 2, '0'));
+	page_template.replace("<%meridian%>", isAM(m_last_display_data.time) ? "am" : "pm");
+
+	page_template.replace("<%day_of_week%>", dayShortStr(tm.Wday));
+	page_template.replace("<%day%>", String(tm.Day));
+	page_template.replace("<%month%>", monthShortStr(tm.Month));
+	page_template.replace("<%year%>", String(tmYearToCalendar(tm.Year)));
+
+	page_template.replace("<%inside_temperature%>", String(m_last_display_data.local_data.temperature));
+	page_template.replace("<%inside_humidity%>", String(m_last_display_data.local_data.humidity));
+
+	page_template.replace("<%outside_temperature%>", 0xffff == m_last_display_data.remote_data.temperature ? "--" : String(m_last_display_data.remote_data.temperature));
+	page_template.replace("<%outside_humidity%>", 0xffff == m_last_display_data.remote_data.humidity ? "--" : String(m_last_display_data.remote_data.humidity));
+
+	send(200, "text/html", page_template);
+}
+
+void WeatherStationBase::handle_sensor_data_post()
 {
 	/*
 	String message = "Received sensor data post\n\n";
 	message += "URI: ";
-	message += m_server.uri();
+	message += uri();
 	message += "\nArguments: ";
-	message += m_server.args();
+	message += args();
 	message += "\n";
-	for (uint8_t i = 0; i < m_server.args(); i++)
+	for (uint8_t i = 0; i < args(); i++)
 	{
-	message += " " + m_server.argName(i) + ": " + m_server.arg(i) + "\n";
+	message += " " + argName(i) + ": " + arg(i) + "\n";
 	}
 	Serial.println(message);
 
-	Serial.printf("temp = \"%s\", humidity = \"%s\"\n", m_server.arg(temp_var_name).c_str(), m_server.arg(humidity_var_name).c_str());
+	Serial.printf("temp = \"%s\", humidity = \"%s\"\n", arg(temp_var_name).c_str(), arg(humidity_var_name).c_str());
 	*/
 
-	// Update the remote sensor data.
-	m_current_remote_sensor_data.temperature = m_server.arg(temp_var_name).toInt();
-	m_current_remote_sensor_data.humidity = m_server.arg(humidity_var_name).toInt();
 
-	m_server.send(200, "text/plain", "OK");
+	// Update the remote sensor data.
+	m_current_remote_sensor_data.temperature = arg(temp_var_name).toInt();
+	m_current_remote_sensor_data.humidity = arg(humidity_var_name).toInt();
+
+	send(200, "text/plain", "OK");
 }
 
-void weather_station_base::on_loop()
+void WeatherStationBase::handleTime()
+{
+	tmElements_t tm;
+	time_t tNow = now();
+	breakTime(tNow, tm);
+
+	String page_template = get_current_page_template();
+
+	page_template.replace("<%hour%>", String(tm.Hour));
+	page_template.replace("<%minute%>", String(tm.Minute));
+
+	page_template.replace("<%day%>", String(tm.Day));
+	page_template.replace("<%month%>", String(tm.Month));
+	page_template.replace("<%year%>", String(tmYearToCalendar(tm.Year)));
+
+	send(200, "text/html", page_template);
+}
+
+void WeatherStationBase::setTime()
+{
+	if (hasArg("hour") && hasArg("minute") && hasArg("month") && hasArg("day") && hasArg("year"))
+	{
+		tmElements_t tm;
+
+		//Serial.printf("setTime: Setting date/time to %s/%s/%s %s:%s\n", arg("month").c_str(), arg("day").c_str(), arg("year").c_str(), arg("hour").c_str(), arg("minute").c_str());
+
+		tm.Hour = (uint8_t)arg("hour").toInt();
+		tm.Minute = (uint8_t)arg("minute").toInt();
+		tm.Second = 0;
+		tm.Month = (uint8_t)arg("month").toInt();
+		tm.Day = (uint8_t)arg("day").toInt();
+		int year = arg("year").toInt();
+		if (year < 100)
+		{
+			year += 2000;
+		}
+		tm.Year = year - 1970;
+
+		time_t new_time = makeTime(tm);
+		::setTime(new_time);
+		m_last_display_data.time = new_time;
+	}
+	else
+	{
+		Serial.println("setTime: arguments missing");
+	}
+
+	sendHeader("Location", "/");
+	send(302, "", "/");
+}
+
+void WeatherStationBase::handleWiFiConfig()
+{
+	String page_template = get_current_page_template();
+
+	send(200, "text/html", page_template);
+}
+
+
+void WeatherStationBase::on_loop()
 {
 	update_local_sensor_data();
 	update_time();
-	m_server.handleClient();
+	handleClient();
 }
 
-void weather_station_base::update_display_timer_func(weather_station_base *ws_base)
+void WeatherStationBase::update_display_timer_func(WeatherStationBase *ws_base)
 {
 	ws_base->update_display();
 }
-void weather_station_base::update_display(bool update_now)
+void WeatherStationBase::update_display(bool update_now)
 {
 	// Get a snapshot of the time and sensor data.
 	time_t current_time = now();
@@ -146,7 +237,7 @@ void weather_station_base::update_display(bool update_now)
 	}
 }
 
-void weather_station_base::update_local_sensor_data(bool update_now)
+void WeatherStationBase::update_local_sensor_data(bool update_now)
 {
 	time_t current_time = millis();
 	if (!update_now && current_time - m_last_local_sensor_update < LOCAL_SENSOR_UPDATE_INTERVAL_MS)
@@ -179,7 +270,7 @@ void weather_station_base::update_local_sensor_data(bool update_now)
 	}
 }
 
-void weather_station_base::update_time(bool update_now)
+void WeatherStationBase::update_time(bool update_now)
 {
 	time_t current_time = millis();
 	if (!update_now && current_time - m_last_time_update < UPDATE_TIME_UPDATE_INTERVAL_MS)
@@ -206,11 +297,11 @@ void weather_station_base::update_time(bool update_now)
 		return;
 	}
 
-	setTime(new_time);
+	::setTime(new_time);
 }
 
 
-void weather_station_base::draw_display()
+void WeatherStationBase::draw_display()
 {
 	tmElements_t tm;
 	breakTime(now(), tm);
@@ -219,15 +310,3 @@ void weather_station_base::draw_display()
 	String display = m_last_display_data.get_date_string() + " " + m_last_display_data.get_time_string() + " In: " + m_last_display_data.get_local_sensor_string() + " Out: " + m_last_display_data.get_remote_sensor_string();
 	Serial.println(display);
 }
-
-void weather_station_base::sensor_data_post_handler()
-{
-	_this->handle_sensor_data_post();
-}
-
-
-void weather_station_base::root_handler()
-{
-	_this->handle_root();
-}
-

@@ -7,12 +7,13 @@
 #include <Ticker.h>
 #include "ntp_client.h"
 
+#include <OOWebServer.h>
 
 #include "sensor_data.h"
 #include "display_data.h"
 
 
-class weather_station_base
+class WeatherStationBase : public OOWebServer<WeatherStationBase>
 {
 public:
 	// Initialize DHT sensor 
@@ -23,25 +24,27 @@ public:
 	// higher the value.  The default for a 16mhz AVR is a value of 6.  For an
 	// Arduino Due that runs at 84mhz a value of 30 works.
 	// This is for the ESP8266 processor on ESP-01 
-	weather_station_base(const char *host_ssid, const char *host_password, uint8_t dht_pin, uint8_t dht_type);
+	WeatherStationBase(const char *host_ssid, const char *host_password, uint8_t dht_pin, uint8_t dht_type);
 
-	void init();
+	void server_begin();
 
 	void handle_root();
 
 	void handle_sensor_data_post();
 
+	void handleTime();
+
+	void setTime();
+
+	void handleWiFiConfig();
+
 	void on_loop();
 
 protected:
-	static void update_display_timer_func(weather_station_base *ws_base);
+	static void update_display_timer_func(WeatherStationBase *ws_base);
 	void update_display(bool update_now = false);
 	void update_local_sensor_data(bool update_now = false);
 	void update_time(bool update_now = false);
-
-	static weather_station_base *_this;
-	static void sensor_data_post_handler();
-	static void root_handler();
 
 private:
 	void draw_display();
@@ -51,7 +54,6 @@ private:
 	String m_host_ssid;
 	String m_host_password;
 	DHT m_dht;
-	ESP8266WebServer m_server;
 	NtpClient m_ntp_client;
 	Ticker m_display_timer;
 	Ticker m_update_time_timer;
