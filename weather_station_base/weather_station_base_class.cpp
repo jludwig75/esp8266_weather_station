@@ -59,6 +59,8 @@ void WeatherStationBase::server_begin()
 		Serial.println("Failed to start WiFi! Continuing without WiFi");
 	}
 
+	SPIFFS.begin();
+
 	Serial.println("Starting web server...\n");
 	on(report_url, HTTP_POST, &WeatherStationBase::handle_sensor_data_post);
 	on("/", &WeatherStationBase::handle_root);

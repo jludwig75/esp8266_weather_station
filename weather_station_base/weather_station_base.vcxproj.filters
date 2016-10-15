@@ -45,6 +45,9 @@
     <ClInclude Include="..\shared\config_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\shared\OOWebServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sensor_data.cpp">
