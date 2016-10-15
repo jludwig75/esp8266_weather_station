@@ -88,7 +88,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>SPIFFS_ROOT_DIR="../weather_station_base/spiffs_data";_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SPIFFS_ROOT_DIR="../weather_station_base/data";_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)esp8266_sim;$(SolutionDir)simple_web_server;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Arduino.h;stdint.h;WString.h</ForcedIncludeFiles>
     </ClCompile>
@@ -103,7 +103,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>SPIFFS_ROOT_DIR="../weather_station_base/spiffs_data";_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SPIFFS_ROOT_DIR="../weather_station_base/data";_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)esp8266_sim;$(SolutionDir)simple_web_server;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Arduino.h;stdint.h;WString.h</ForcedIncludeFiles>
     </ClCompile>
@@ -120,7 +120,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>SPIFFS_ROOT_DIR="../weather_station_base/spiffs_data";_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SPIFFS_ROOT_DIR="../weather_station_base/data";_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)esp8266_sim;$(SolutionDir)simple_web_server;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Arduino.h;stdint.h;WString.h</ForcedIncludeFiles>
     </ClCompile>
@@ -139,7 +139,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>SPIFFS_ROOT_DIR="../weather_station_base/spiffs_data";_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SPIFFS_ROOT_DIR="../weather_station_base/data";_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)esp8266_sim;$(SolutionDir)simple_web_server;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Arduino.h;stdint.h;WString.h</ForcedIncludeFiles>
     </ClCompile>
@@ -172,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="..\weather_station_base\weather_station_base_class.cpp" />
     <ClCompile Include="init_sim.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="config_file.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
