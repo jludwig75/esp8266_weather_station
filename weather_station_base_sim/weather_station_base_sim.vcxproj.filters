@@ -34,9 +34,12 @@
     <ClCompile Include="..\shared\wifi_ap_sim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\config_file.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config_file.h">
+    <ClInclude Include="..\shared\config_file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

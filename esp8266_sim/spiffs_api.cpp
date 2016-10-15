@@ -73,7 +73,12 @@ static int convert_open_flags(OpenMode openMode, AccessMode accessMode)
 
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
 {
-    string file_name = spiffs_root + path;
+	string sep = "";
+	if (path[0] != '/')
+	{
+		sep = "/";
+	}
+    string file_name = spiffs_root + sep + path;
 
     int fd = _open(file_name.c_str(), convert_open_flags(openMode, accessMode), _S_IREAD | _S_IWRITE);
     if (fd == -1)

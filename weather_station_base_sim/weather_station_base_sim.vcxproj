@@ -159,6 +159,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\shared\config_file.cpp" />
     <ClCompile Include="..\shared\ntp_client_sim.cpp" />
     <ClCompile Include="..\shared\wifi_ap_sim.cpp" />
     <ClCompile Include="..\weather_station_base\display_data.cpp" />
@@ -174,7 +175,7 @@
     <ClCompile Include="init_sim.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config_file.h" />
+    <ClInclude Include="..\shared\config_file.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -8,6 +8,27 @@
     <VCCodeModel>
       <VCCodeMacros />
     </VCCodeModel>
-    <BreakPoints />
+    <BreakPoints>
+      <BreakPoint Index="1" Name="spiffs_api.cpp, line 79" Id="9b5b7cd7-18cf-4f61-a571-5ee707a55762" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="c:\code\esp8266_weather_station\esp8266_sim\spiffs_api.cpp" FileLine="79" FileColumn="1" FunctionName="open(const char* path, OpenMode openMode, AccessMode accessMode)" FunctionLineOffset="5" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='9b5b7cd7-18cf-4f61-a571-5ee707a55762'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
+        <Source>72	
+73	
+74	FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
+75	{
+76		string sep = "";
+77		if (path[0] != '/')
+78		{
+--&gt;79			sep = "/";
+80		}
+81	    string file_name = spiffs_root + sep + path;
+82	
+83	    int fd = _open(file_name.c_str(), convert_open_flags(openMode, accessMode), _S_IREAD | _S_IWRITE);
+84	    if (fd == -1)
+85	    {
+86	        return NULL;
+87	    }
+88	
+</Source>
+      </BreakPoint>
+    </BreakPoints>
   </Program>
 </VisualMicro>
