@@ -34,3 +34,20 @@ bool connect_wifi(const char *ap_ssid, const char *ap_password, int retries)
 
 	return true;
 }
+
+
+bool disconnect_wifi()
+{
+    return WiFi.disconnect();
+}
+
+bool is_wifi_connected()
+{
+    return WiFi.isConnected();
+}
+
+
+IPAddress get_local_ip()
+{
+    return WiFi.localIP();
+}

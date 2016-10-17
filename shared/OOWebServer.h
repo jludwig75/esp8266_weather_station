@@ -115,6 +115,17 @@ protected:
         return "";
     }
 
+    void redirect_to(const String &uri)
+    {
+        sendHeader("Location", uri);
+        send(302, "", uri);
+    }
+
+    void render_page(const String &content)
+    {
+        send(200, "text/html", content);
+    }
+
 private:
     struct html_page_info
     {

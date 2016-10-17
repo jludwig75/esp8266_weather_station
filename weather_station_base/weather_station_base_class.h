@@ -24,7 +24,7 @@ public:
 	// higher the value.  The default for a 16mhz AVR is a value of 6.  For an
 	// Arduino Due that runs at 84mhz a value of 30 works.
 	// This is for the ESP8266 processor on ESP-01 
-	WeatherStationBase(const char *host_ssid, const char *host_password, uint8_t dht_pin, uint8_t dht_type);
+	WeatherStationBase(uint8_t dht_pin, uint8_t dht_type);
 
 	void server_begin();
 
@@ -33,10 +33,10 @@ public:
 	void handle_sensor_data_post();
 
 	void handleTime();
-
 	void setTime();
 
 	void handleWiFiConfig();
+    void setWiFiConfig();
 
 	void on_loop();
 
@@ -46,6 +46,9 @@ protected:
 	void update_local_sensor_data(bool update_now = false);
 	void update_time(bool update_now = false);
 
+    bool load_config();
+    bool save_config(const String & ap, const String & ap_passwd);
+
 private:
 	void draw_display();
 	bool m_wifi_connected;
@@ -53,7 +56,7 @@ private:
 	time_t m_last_local_sensor_update;
 	String m_host_ssid;
 	String m_host_password;
-	DHT m_dht;
+    DHT m_dht;
 	NtpClient m_ntp_client;
 	Ticker m_display_timer;
 	Ticker m_update_time_timer;

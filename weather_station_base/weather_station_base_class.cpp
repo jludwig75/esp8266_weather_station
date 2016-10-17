@@ -4,12 +4,19 @@
 #include "wifi_station.h"
 
 #include "ws_common.h"
+#include "config_file.h"
+
+#define CONFIG_FILE_NAME    "ws_config.json"
 
 
 #define DISPLAY_UPDATE_INTERVAL_MS      1000              // 1 second
 #define LOCAL_SENSOR_UPDATE_INTERVAL_MS ( 1 * 60 * 1000)  // 1 minute
 #define UPDATE_TIME_UPDATE_INTERVAL_MS  (15 * 60 * 1000)  // 15 minutes
 #define UDP_LISTEN_PORT                 8888
+
+
+const char* k_default_host_ssid = "ACESS_POINT";
+const char* k_default_host_password = "Password123";
 
 
 const int timeZone = -6;     // Mountain Daylight Time
@@ -32,20 +39,22 @@ void reset()
 // higher the value.  The default for a 16mhz AVR is a value of 6.  For an
 // Arduino Due that runs at 84mhz a value of 30 works.
 // This is for the ESP8266 processor on ESP-01 
-WeatherStationBase::WeatherStationBase(const char *host_ssid, const char *host_password, uint8_t dht_pin, uint8_t dht_type) :
+WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 	OOWebServer<WeatherStationBase>("/web_templates", TEMP_REPORT_SERVER_LISTEN_PORT),
 	m_wifi_connected(false),
 	m_dht(dht_pin, dht_type, 11), // 11 works fine for ESP8266
 	m_ntp_client(timeZone),
 	m_last_time_update(millis()),
 	m_last_local_sensor_update(millis()),
-	m_host_ssid(host_ssid),
-	m_host_password(host_password)
+	m_host_ssid(k_default_host_ssid),
+	m_host_password(k_default_host_password)
 {
 }
 // setup() methods
 void WeatherStationBase::server_begin()
 {
+    load_config();
+
 	m_dht.begin();
 	if (!start_access_point(ap_ssid, ap_password))
 	{
@@ -66,7 +75,8 @@ void WeatherStationBase::server_begin()
 	on("/", &WeatherStationBase::handle_root);
 	on("/time", HTTP_GET, &WeatherStationBase::handleTime);
 	on("/time", HTTP_POST, &WeatherStationBase::setTime);
-	on("/wifi_config", &WeatherStationBase::handleWiFiConfig);
+	on("/wifi_config", HTTP_GET, &WeatherStationBase::handleWiFiConfig);
+    on("/wifi_config", HTTP_POST, &WeatherStationBase::setWiFiConfig);
 
 	Serial.println("Starting NTP client...");
 	m_ntp_client.begin();
@@ -84,6 +94,37 @@ void WeatherStationBase::server_begin()
 	m_display_timer.attach_ms(DISPLAY_UPDATE_INTERVAL_MS, update_display_timer_func, this);
 }
 
+
+bool WeatherStationBase::load_config()
+{
+    ConfigFile config_file(CONFIG_FILE_NAME);
+
+    if (!config_file.Load()) {
+        return false;
+    }
+
+    m_host_ssid = config_file.get_host_ap();
+    m_host_password = config_file.get_host_ap_passwd();
+    return true;
+}
+
+bool WeatherStationBase::save_config(const String & ap, const String & ap_passwd)
+{
+    ConfigFile config_file(CONFIG_FILE_NAME);
+
+    config_file.set_host_ap(ap);
+    config_file.set_host_ap_passwd(ap_passwd);
+
+    if (!config_file.Save())
+    {
+        return false;
+    }
+
+    m_host_ssid = ap;
+    m_host_password = ap_passwd;
+    return true;
+}
+
 static String pad_string(const String & _str, size_t width, char fill_char)
 {
 	String str = _str;
@@ -97,6 +138,15 @@ static String pad_string(const String & _str, size_t width, char fill_char)
 	}
 
 	return str;
+}
+
+String IPAddressToString(const IPAddress & ip_address)
+{
+    String str;
+
+    str = String(ip_address[0]) + "." + ip_address[1] + "." + ip_address[2] + "." + ip_address[3];
+
+    return str;
 }
 
 void WeatherStationBase::handle_root()
@@ -122,7 +172,14 @@ void WeatherStationBase::handle_root()
 	page_template.replace("<%outside_temperature%>", 0xffff == m_last_display_data.remote_data.temperature ? "--" : String(m_last_display_data.remote_data.temperature));
 	page_template.replace("<%outside_humidity%>", 0xffff == m_last_display_data.remote_data.humidity ? "--" : String(m_last_display_data.remote_data.humidity));
 
-	send(200, "text/html", page_template);
+    String local_ip_string = "Not connected";
+    if (is_wifi_connected())
+    {
+        local_ip_string = IPAddressToString(get_local_ip());
+    }
+    page_template.replace("<%host_ip%>", local_ip_string);
+
+    render_page(page_template);
 }
 
 void WeatherStationBase::handle_sensor_data_post()
@@ -166,7 +223,7 @@ void WeatherStationBase::handleTime()
 	page_template.replace("<%month%>", String(tm.Month));
 	page_template.replace("<%year%>", String(tmYearToCalendar(tm.Year)));
 
-	send(200, "text/html", page_template);
+    render_page(page_template);
 }
 
 void WeatherStationBase::setTime()
@@ -198,15 +255,45 @@ void WeatherStationBase::setTime()
 		Serial.println("setTime: arguments missing");
 	}
 
-	sendHeader("Location", "/");
-	send(302, "", "/");
+    redirect_to("/");
 }
 
 void WeatherStationBase::handleWiFiConfig()
 {
 	String page_template = get_current_page_template();
 
-	send(200, "text/html", page_template);
+    page_template.replace("<%ap%>", m_host_ssid);
+    page_template.replace("<%ap_passwd%>", m_host_password);
+
+    render_page(page_template);
+}
+
+
+void WeatherStationBase::setWiFiConfig()
+{
+    if (!hasArg("ap") || !hasArg("ap_passwd")) {
+        Serial.println("setTime: arguments missing");
+    }
+    else
+    {
+        if (!save_config(arg("ap"), arg("ap_passwd")))
+        {
+            // TODO: Error
+        }
+
+        if (m_wifi_connected)
+        {
+            disconnect_wifi();
+            m_wifi_connected = false;
+        }
+
+        if (!connect_wifi(m_host_ssid.c_str(), m_host_password.c_str(), 60))
+        {
+            // TODO: Error
+        }
+    }
+
+    redirect_to("/");
 }
 
 

@@ -12,11 +12,8 @@
 #define DHTTYPE DHT22
 #define DHTPIN  2
 
-const char* host_ssid            = "Caradhras";
-const char* host_password        = "Speak friend.";
 
-
-WeatherStationBase g_weather_station_base(host_ssid, host_password, DHTPIN, DHTTYPE);
+WeatherStationBase g_weather_station_base(DHTPIN, DHTTYPE);
 
 
 void setup()
