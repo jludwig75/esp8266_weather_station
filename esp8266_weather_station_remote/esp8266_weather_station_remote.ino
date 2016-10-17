@@ -15,8 +15,8 @@
 
 // Data shared between client and server:
 
-const char *report_server = "192.168.4.1";
-//const char *report_server = "127.0.0.1";
+//const char *report_server = "192.168.4.1";
+const char *report_server = "127.0.0.1";
 
 
 // Initialize DHT sensor 
