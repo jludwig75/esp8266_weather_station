@@ -15,8 +15,11 @@
 
 // Data shared between client and server:
 
-//const char *report_server = "192.168.4.1";
+#ifdef WIN32
 const char *report_server = "127.0.0.1";
+#else // WIN32
+const char *report_server = "192.168.4.1";
+#endif // WIN32
 
 
 // Initialize DHT sensor 

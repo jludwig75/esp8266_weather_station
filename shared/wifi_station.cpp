@@ -1,6 +1,5 @@
 #include "wifi_station.h"
 
-#include <ESP8266WiFi.h>
 
 bool connect_wifi(const char *ap_ssid, const char *ap_password, int retries)
 {
