@@ -45,20 +45,12 @@ WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 	m_last_local_sensor_update(millis()),
 	m_host_ssid(k_default_host_ssid),
 	m_host_password(k_default_host_password),
+	m_std_string(k_default_tz_std_name),
+	m_dst_string(k_default_tz_dst_name),
+	m_std_offset(k_default_std_tz_offset),
+	m_dst_offset(k_default_dst_tz_offset),
 	m_tz(NULL)
 {
-	String stdString = default_tz_std_name;
-	String dstString = default_tz_dst_name;
-	int std_offset = default_std_tz_offset;
-	int dst_offset = default_dst_tz_offset;
-
-	// TODO: Load the above values from the config file.
-
-	TimeChangeRule myDST = { "", Second, Sun, Mar, 2, dst_offset };    //Daylight time = UTC - 6 hours
-	TimeChangeRule mySTD = { "", First, Sun, Nov, 2, std_offset };     //Standard time = UTC - 7 hours
-	strncpy(myDST.abbrev, dstString.c_str(), sizeof(myDST.abbrev));
-	strncpy(mySTD.abbrev, stdString.c_str(), sizeof(mySTD.abbrev));
-	m_tz = new Timezone(myDST, mySTD);
 }
 
 WeatherStationBase::~WeatherStationBase()
@@ -73,6 +65,21 @@ void WeatherStationBase::server_begin()
 	SPIFFS.begin();
 
 	load_config();
+
+	Serial.print("TZ Info: ");
+	Serial.print(m_std_string);
+	Serial.print(" ");
+	Serial.print(m_std_offset);
+	Serial.print(", ");
+	Serial.print(m_dst_string);
+	Serial.print(" ");
+	Serial.println(m_dst_offset);
+
+	TimeChangeRule myDST = { "", Second, Sun, Mar, 2, m_dst_offset };    //Daylight time = UTC - 6 hours
+	TimeChangeRule mySTD = { "", First, Sun, Nov, 2, m_std_offset };     //Standard time = UTC - 7 hours
+	strncpy(myDST.abbrev, m_dst_string.c_str(), sizeof(myDST.abbrev));
+	strncpy(mySTD.abbrev, m_std_string.c_str(), sizeof(mySTD.abbrev));
+	m_tz = new Timezone(myDST, mySTD);
 
 	m_dht.begin();
 	if (!start_access_point(ap_ssid, ap_password))
@@ -122,15 +129,38 @@ bool WeatherStationBase::load_config()
 
     m_host_ssid = config_file.get_host_ap();
     m_host_password = config_file.get_host_ap_passwd();
-    return true;
+
+	if (config_file.get_std_string().length() > 0 && config_file.get_dst_string().length() > 0)
+	{
+		m_dst_string = config_file.get_dst_string();
+		m_dst_offset = config_file.get_dst_offset();
+		m_std_string = config_file.get_std_string();
+		m_std_offset = config_file.get_std_offset();
+	}
+
+	return true;
 }
 
-bool WeatherStationBase::save_config(const String & ap, const String & ap_passwd)
+bool WeatherStationBase::save_wifi_config(const String & ap, const String & ap_passwd)
+{
+	return save_config(ap, ap_passwd, m_std_string, m_std_offset, m_dst_string, m_dst_offset);
+}
+
+bool WeatherStationBase::save_tz_config(const String & std_string, int std_offset, const String & dst_string, int dst_offset)
+{
+	return save_config(m_host_ssid, m_host_password, std_string, std_offset, dst_string, dst_offset);
+}
+
+bool WeatherStationBase::save_config(const String & ap, const String & ap_passwd, const String & std_string, int std_offset, const String & dst_string, int dst_offset)
 {
     ConfigFile config_file(CONFIG_FILE_NAME);
 
     config_file.set_host_ap(ap);
     config_file.set_host_ap_passwd(ap_passwd);
+	config_file.set_std_string(std_string);
+	config_file.set_std_offset(std_offset);
+	config_file.set_dst_string(dst_string);
+	config_file.set_dst_offset(dst_offset);
 
     if (!config_file.Save())
     {
@@ -139,7 +169,11 @@ bool WeatherStationBase::save_config(const String & ap, const String & ap_passwd
 
     m_host_ssid = ap;
     m_host_password = ap_passwd;
-    return true;
+	m_std_string = std_string;
+	m_std_offset = std_offset;
+	m_dst_string = dst_string;
+	m_dst_offset = dst_offset;
+	return true;
 }
 
 static String pad_string(const String & _str, size_t width, char fill_char)
@@ -266,6 +300,12 @@ void WeatherStationBase::setTime()
 		time_t new_time = makeTime(tm);
 		::setTime(new_time);
 		m_last_display_data.time = new_time;
+
+		// Save the TZ information:
+		if (!save_tz_config(m_std_string, m_std_offset, m_dst_string, m_dst_offset))
+		{
+			// TODO: error
+		}
 	}
 	else
 	{
@@ -293,7 +333,7 @@ void WeatherStationBase::setWiFiConfig()
     }
     else
     {
-        if (!save_config(arg("ap"), arg("ap_passwd")))
+        if (!save_wifi_config(arg("ap"), arg("ap_passwd")))
         {
             // TODO: Error
         }

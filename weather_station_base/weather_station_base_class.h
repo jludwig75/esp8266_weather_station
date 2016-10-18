@@ -51,7 +51,9 @@ protected:
 	void update_time(bool update_now = false);
 
     bool load_config();
-    bool save_config(const String & ap, const String & ap_passwd);
+    bool save_wifi_config(const String & ap, const String & ap_passwd);
+	bool save_tz_config(const String & std_string, int std_offset, const String & dst_string, int dst_offset);
+	bool save_config(const String & ap, const String & ap_passwd, const String & std_string, int std_offset, const String & dst_string, int dst_offset);
 
 private:
 	void draw_display();
@@ -68,5 +70,9 @@ private:
 	sensor_data m_current_local_sensor_data;
 	sensor_data m_current_remote_sensor_data;
 	display_data m_last_display_data;
+	String m_std_string;
+	String m_dst_string;
+	int m_std_offset;
+	int m_dst_offset;
 	Timezone *m_tz;
 };

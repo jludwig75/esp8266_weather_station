@@ -38,7 +38,7 @@ bool ConfigFile::Load()
 	// use configFile.readString instead.
 	config_file.readBytes(buf.get(), size);
 
-	ArduinoJson::StaticJsonBuffer<200> jsonBuffer;
+	ArduinoJson::StaticJsonBuffer<400> jsonBuffer;
 	ArduinoJson::JsonObject& json = jsonBuffer.parseObject(buf.get());
 
 	if (!json.success()) {
@@ -48,16 +48,26 @@ bool ConfigFile::Load()
 
 	_host_ap = json["host_ap"].asString();
 	_host_ap_passwd = json["host_ap_passwd"].asString();
+	_std_string = json["std_string"].asString();
+	_dst_string = json["dst_string"].asString();
+	_std_offset = String(json["std_offset"].asString()).toInt();
+	_dst_offset = String(json["dst_offset"].asString()).toInt();
 
 	return true;
 }
 
 bool ConfigFile::Save()
 {
-	ArduinoJson::StaticJsonBuffer<200> jsonBuffer;
+	ArduinoJson::StaticJsonBuffer<400> jsonBuffer;
 	ArduinoJson::JsonObject& json = jsonBuffer.createObject();
 	json["host_ap"] = _host_ap.c_str();
 	json["host_ap_passwd"] = _host_ap_passwd.c_str();
+	json["std_string"] = _std_string.c_str();
+	json["dst_string"] = _dst_string.c_str();
+	String std_offset = String(_std_offset);
+	String dst_offset = String(_dst_offset);
+	json["std_offset"] = std_offset.c_str();
+	json["dst_offset"] = dst_offset.c_str();
 
 	File config_file = SPIFFS.open(_file_name, "w");
 	if (!config_file) {
