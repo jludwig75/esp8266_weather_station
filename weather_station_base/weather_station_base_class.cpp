@@ -6,7 +6,7 @@
 #include "ws_common.h"
 #include "config_file.h"
 
-#define CONFIG_FILE_NAME    "ws_config.json"
+#define CONFIG_FILE_NAME    "/ws_config.json"
 
 
 #define DISPLAY_UPDATE_INTERVAL_MS      1000              // 1 second
@@ -53,7 +53,9 @@ WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 // setup() methods
 void WeatherStationBase::server_begin()
 {
-    load_config();
+	SPIFFS.begin();
+
+	load_config();
 
 	m_dht.begin();
 	if (!start_access_point(ap_ssid, ap_password))
@@ -62,13 +64,11 @@ void WeatherStationBase::server_begin()
 		reset();
 	}
 
-	m_wifi_connected = connect_wifi(m_host_ssid.c_str(), m_host_password.c_str(), 60); // About 30 seconds
+	m_wifi_connected = connect_wifi(m_host_ssid.c_str(), m_host_password.c_str(), 20); // About 10 seconds
 	if (!m_wifi_connected)
 	{
 		Serial.println("Failed to start WiFi! Continuing without WiFi");
 	}
-
-	SPIFFS.begin();
 
 	Serial.println("Starting web server...\n");
 	on(report_url, HTTP_POST, &WeatherStationBase::handle_sensor_data_post);
@@ -287,7 +287,7 @@ void WeatherStationBase::setWiFiConfig()
             m_wifi_connected = false;
         }
 
-        if (!connect_wifi(m_host_ssid.c_str(), m_host_password.c_str(), 60))
+        if (!connect_wifi(m_host_ssid.c_str(), m_host_password.c_str(), 20))
         {
             // TODO: Error
         }
@@ -370,7 +370,7 @@ void WeatherStationBase::update_time(bool update_now)
 
 	if (!m_wifi_connected)
 	{
-		m_wifi_connected = connect_wifi(m_host_ssid.c_str(), m_host_password.c_str(), 60); // About 30 seconds
+		m_wifi_connected = connect_wifi(m_host_ssid.c_str(), m_host_password.c_str(), 20); // About 10 seconds
 		if (!m_wifi_connected)
 		{
 			Serial.println("Failed to start WiFi! Skipping time update.");

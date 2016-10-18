@@ -21,6 +21,7 @@ bool connect_wifi(const char *ap_ssid, const char *ap_password, int retries)
 		Serial.println("");
 		Serial.print("Failed tp connect to ");
 		Serial.println(ap_ssid);
+		WiFi.disconnect();
 		return false;
 	}
 
