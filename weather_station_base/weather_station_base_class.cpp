@@ -6,6 +6,8 @@
 #include "ws_common.h"
 #include "config_file.h"
 
+#include <Timezone.h>
+
 #define CONFIG_FILE_NAME    "/ws_config.json"
 
 
@@ -19,11 +21,6 @@ const char* k_default_host_ssid = "ACESS_POINT";
 const char* k_default_host_password = "Password123";
 
 
-const int timeZone = -6;     // Mountain Daylight Time
-							 //const int timeZone = -5;  // Eastern Standard Time (USA)
-							 //const int timeZone = -4;  // Eastern Daylight Time (USA)
-							 //const int timeZone = -8;  // Pacific Standard Time (USA)
-							 //const int timeZone = -7;  // Pacific Daylight Time (USA)
 
 void reset()
 {
@@ -43,13 +40,33 @@ WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 	OOWebServer<WeatherStationBase>("/web_templates", TEMP_REPORT_SERVER_LISTEN_PORT),
 	m_wifi_connected(false),
 	m_dht(dht_pin, dht_type, 11), // 11 works fine for ESP8266
-	m_ntp_client(timeZone),
+	m_ntp_client(),
 	m_last_time_update(millis()),
 	m_last_local_sensor_update(millis()),
 	m_host_ssid(k_default_host_ssid),
-	m_host_password(k_default_host_password)
+	m_host_password(k_default_host_password),
+	m_tz(NULL)
 {
+	String stdString = default_tz_std_name;
+	String dstString = default_tz_dst_name;
+	int std_offset = default_std_tz_offset;
+	int dst_offset = default_dst_tz_offset;
+
+	// TODO: Load the above values from the config file.
+
+	TimeChangeRule myDST = { "", Second, Sun, Mar, 2, dst_offset };    //Daylight time = UTC - 6 hours
+	TimeChangeRule mySTD = { "", First, Sun, Nov, 2, std_offset };     //Standard time = UTC - 7 hours
+	strncpy(myDST.abbrev, dstString.c_str(), sizeof(myDST.abbrev));
+	strncpy(mySTD.abbrev, stdString.c_str(), sizeof(mySTD.abbrev));
+	m_tz = new Timezone(myDST, mySTD);
 }
+
+WeatherStationBase::~WeatherStationBase()
+{
+	delete m_tz;
+}
+
+
 // setup() methods
 void WeatherStationBase::server_begin()
 {
@@ -378,7 +395,7 @@ void WeatherStationBase::update_time(bool update_now)
 		}
 	}
 	// Get the time via NTP
-	time_t new_time = m_ntp_client.get_time();
+	time_t new_time = m_tz->toLocal(m_ntp_client.get_time());
 
 	// Update the time
 	if (new_time == 0)

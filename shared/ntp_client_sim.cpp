@@ -5,7 +5,7 @@
 #include <time.h>
 
 
-NtpClient::NtpClient(int tz_adjust_hours) : m_udp(NULL), _tz_adjust_hours(tz_adjust_hours)
+NtpClient::NtpClient() : m_udp(NULL)
 {
 }
 
@@ -21,5 +21,5 @@ extern "C" time_t time(time_t *t);
 
 time_t NtpClient::get_time() const
 {
-	return time(NULL) + _tz_adjust_hours * SECS_PER_HOUR;
+	return time(NULL);
 }

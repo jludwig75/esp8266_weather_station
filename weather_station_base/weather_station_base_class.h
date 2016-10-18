@@ -13,6 +13,9 @@
 #include "display_data.h"
 
 
+class Timezone;
+
+
 class WeatherStationBase : public OOWebServer<WeatherStationBase>
 {
 public:
@@ -25,6 +28,7 @@ public:
 	// Arduino Due that runs at 84mhz a value of 30 works.
 	// This is for the ESP8266 processor on ESP-01 
 	WeatherStationBase(uint8_t dht_pin, uint8_t dht_type);
+	~WeatherStationBase();
 
 	void server_begin();
 
@@ -51,6 +55,7 @@ protected:
 
 private:
 	void draw_display();
+
 	bool m_wifi_connected;
 	time_t m_last_time_update;
 	time_t m_last_local_sensor_update;
@@ -63,4 +68,5 @@ private:
 	sensor_data m_current_local_sensor_data;
 	sensor_data m_current_remote_sensor_data;
 	display_data m_last_display_data;
+	Timezone *m_tz;
 };

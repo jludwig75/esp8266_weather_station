@@ -5,6 +5,7 @@
 #include <DHT.h>
 #include <Ticker.h>
 #include <TimeLib.h>
+#include <Timezone.h>
 
 #include "weather_station_base_class.h"
 
