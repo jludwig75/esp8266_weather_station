@@ -180,14 +180,27 @@ private:
             Serial.print(template_fil_name.c_str());
             Serial.println("'\n");
             size_t template_size = template_file.size();
-            char *template_contents = new char[template_size + 1];
+			Serial.println("File is ");
+			Serial.println(template_size);
+			Serial.println(" bytes.");
+			char *template_contents = new char[template_size + 1];
             if (template_contents)
             {
-                size_t bytes_read = template_file.readBytes(template_contents, template_size);
-                template_contents[bytes_read] = 0;
+				Serial.println("Successfully allocated template file buffer.");
+				size_t bytes_read = template_file.readBytes(template_contents, template_size);
+
+				Serial.println("Read ");
+				Serial.println(template_size);
+				Serial.println(" bytes from template file.");
+
+				template_contents[bytes_read] = 0;
 
                 page_info->_template_data = String(template_contents);
             }
+			else
+			{
+				Serial.println("Failed to allocate template file buffer.");
+			}
 
             template_file.close();
         }
