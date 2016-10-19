@@ -99,6 +99,7 @@ void WeatherStationBase::server_begin()
 	on("/", &WeatherStationBase::handle_root);
 	on("/time", HTTP_GET, &WeatherStationBase::handleTime);
 	on("/time", HTTP_POST, &WeatherStationBase::setTime);
+	on("/time_zone", HTTP_POST, &WeatherStationBase::setTimeZone);
 	on("/wifi_config", HTTP_GET, &WeatherStationBase::handleWiFiConfig);
     on("/wifi_config", HTTP_POST, &WeatherStationBase::setWiFiConfig);
 
@@ -262,7 +263,7 @@ void WeatherStationBase::handle_sensor_data_post()
 void WeatherStationBase::handleTime()
 {
 	tmElements_t tm;
-	time_t tNow = now();
+	time_t tNow = m_tz->toLocal(now());
 	breakTime(tNow, tm);
 
 	String page_template = get_current_page_template();
@@ -298,14 +299,8 @@ void WeatherStationBase::setTime()
 		tm.Year = year - 1970;
 
 		time_t new_time = makeTime(tm);
-		::setTime(new_time);
+		::setTime(m_tz->toUTC(new_time));
 		m_last_display_data.time = new_time;
-
-		// Save the TZ information:
-		if (!save_tz_config(m_std_string, m_std_offset, m_dst_string, m_dst_offset))
-		{
-			// TODO: error
-		}
 	}
 	else
 	{
@@ -314,6 +309,56 @@ void WeatherStationBase::setTime()
 
     redirect_to("/");
 }
+
+void WeatherStationBase::setTimeZone()
+{
+	if (hasArg("time_zone"))
+	{
+		String tz_string = arg("time_zone");
+		bool use_dst = tz_string.endsWith("d");
+		if (use_dst)
+		{
+			tz_string = tz_string.substring(0, tz_string.length() - 1);
+		}
+
+		float offset = tz_string.toFloat();
+		offset *= SECS_PER_MIN;
+
+		int std_offset = (int)offset;
+		int dst_offset = (int)offset;
+
+		String std_string = "?ST";
+		String dst_string = "?ST";
+
+		if (use_dst)
+		{
+			dst_offset += SECS_PER_MIN;
+			dst_string[1] = 'D';
+		}
+
+		// Save the TZ information:
+		if (!save_tz_config(std_string, std_offset, dst_string, dst_offset))
+		{
+			// TODO: error
+		}
+
+		delete m_tz;
+		TimeChangeRule myDST = { "", Second, Sun, Mar, 2, m_dst_offset };    //Daylight time = UTC - 6 hours
+		TimeChangeRule mySTD = { "", First, Sun, Nov, 2, m_std_offset };     //Standard time = UTC - 7 hours
+		strncpy(myDST.abbrev, m_dst_string.c_str(), sizeof(myDST.abbrev));
+		strncpy(mySTD.abbrev, m_std_string.c_str(), sizeof(mySTD.abbrev));
+		m_tz = new Timezone(myDST, mySTD);
+
+		m_last_display_data.time = m_tz->toLocal(now());
+	}
+	else
+	{
+		Serial.println("setTimeZone: arguments missing");
+	}
+
+	redirect_to("/");
+}
+
 
 void WeatherStationBase::handleWiFiConfig()
 {
@@ -348,6 +393,8 @@ void WeatherStationBase::setWiFiConfig()
         {
             // TODO: Error
         }
+
+		update_time(true);
     }
 
     redirect_to("/");
@@ -368,7 +415,7 @@ void WeatherStationBase::update_display_timer_func(WeatherStationBase *ws_base)
 void WeatherStationBase::update_display(bool update_now)
 {
 	// Get a snapshot of the time and sensor data.
-	time_t current_time = now();
+	time_t current_time = m_tz->toLocal(now());
 	sensor_data current_local_sensor_data = m_current_local_sensor_data;
 	sensor_data current_remote_sensor_data = m_current_remote_sensor_data;
 
@@ -443,14 +490,14 @@ void WeatherStationBase::update_time(bool update_now)
 		return;
 	}
 
-	::setTime(new_time);
+	::setTime(m_tz->toUTC(new_time));
 }
 
 
 void WeatherStationBase::draw_display()
 {
 	tmElements_t tm;
-	breakTime(now(), tm);
+	breakTime(m_tz->toLocal(now()), tm);
 
 	// TODO: Go to LCD.
 	String display = m_last_display_data.get_date_string() + " " + m_last_display_data.get_time_string() + " In: " + m_last_display_data.get_local_sensor_string() + " Out: " + m_last_display_data.get_remote_sensor_string();

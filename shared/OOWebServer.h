@@ -183,8 +183,8 @@ private:
             char *template_contents = new char[template_size + 1];
             if (template_contents)
             {
-                template_file.readBytes(template_contents, template_size);
-                template_contents[template_size] = 0;
+                size_t bytes_read = template_file.readBytes(template_contents, template_size);
+                template_contents[bytes_read] = 0;
 
                 page_info->_template_data = String(template_contents);
             }

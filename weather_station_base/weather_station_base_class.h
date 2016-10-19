@@ -38,6 +38,7 @@ public:
 
 	void handleTime();
 	void setTime();
+	void setTimeZone();
 
 	void handleWiFiConfig();
     void setWiFiConfig();

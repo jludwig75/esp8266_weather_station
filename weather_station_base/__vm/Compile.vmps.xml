@@ -29,26 +29,6 @@
 88	
 </Source>
       </BreakPoint>
-      <BreakPoint Index="2" Name="config_file.cpp, line 69" Id="ac74417f-808f-4938-8e71-a0d417904367" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="c:\code\esp8266_weather_station\shared\config_file.cpp" FileLine="69" FileColumn="1" FunctionName="Save()" FunctionLineOffset="10" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='37af2a0e-fec7-409b-bf85-ff71bc30044a'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
-        <Source>62		ArduinoJson::JsonObject&amp; json = jsonBuffer.createObject();
-63		json["host_ap"] = _host_ap.c_str();
-64		json["host_ap_passwd"] = _host_ap_passwd.c_str();
-65		json["std_string"] = _std_string.c_str();
-66		json["dst_string"] = _dst_string.c_str();
-67		String std_offset = String(_std_offset);
-68		String dst_offset = String(_dst_offset);
---&gt;69		json["std_offset"] = std_offset.c_str();
-70		json["dst_offset"] = dst_offset.c_str();
-71	
-72		File config_file = SPIFFS.open(_file_name, "w");
-73		if (!config_file) {
-74			Serial.println("Failed to open config file for writing");
-75			return false;
-76		}
-77	
-78		JSON_NS::String str;
-</Source>
-      </BreakPoint>
     </BreakPoints>
   </Program>
 </VisualMicro>
