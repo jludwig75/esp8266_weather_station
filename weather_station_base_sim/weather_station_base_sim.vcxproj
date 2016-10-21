@@ -89,7 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ARDUINO=100;_USE_32BIT_TIME_T;SPIFFS_ROOT_DIR="../weather_station_base/data";_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)esp8266_sim;$(SolutionDir)simple_web_server;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)simple_web_server;$(SolutionDir)esp8266_sim;$(SolutionDir)weather_station_base;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Arduino.h;stdint.h;WString.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
@@ -104,7 +104,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ARDUINO=100;_USE_32BIT_TIME_T;SPIFFS_ROOT_DIR="../weather_station_base/data";_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)esp8266_sim;$(SolutionDir)simple_web_server;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)simple_web_server;$(SolutionDir)esp8266_sim;$(SolutionDir)weather_station_base;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Arduino.h;stdint.h;WString.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
@@ -121,7 +121,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>ARDUINO=100;_USE_32BIT_TIME_T;SPIFFS_ROOT_DIR="../weather_station_base/data";_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)esp8266_sim;$(SolutionDir)simple_web_server;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)simple_web_server;$(SolutionDir)esp8266_sim;$(SolutionDir)weather_station_base;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Arduino.h;stdint.h;WString.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
@@ -140,7 +140,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>ARDUINO=100;_USE_32BIT_TIME_T;SPIFFS_ROOT_DIR="../weather_station_base/data";_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)esp8266_sim;$(SolutionDir)simple_web_server;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)simple_web_server;$(SolutionDir)esp8266_sim;$(SolutionDir)weather_station_base;$(ProjectDir);$(SolutionDir)shared;$(SolutionDir)include</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>Arduino.h;stdint.h;WString.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
@@ -172,6 +172,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\weather_station_base\weather_station_base_class.cpp" />
+    <ClCompile Include="display_sim.cpp" />
     <ClCompile Include="init_sim.cpp" />
   </ItemGroup>
   <ItemGroup>

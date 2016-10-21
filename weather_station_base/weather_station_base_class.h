@@ -11,7 +11,7 @@
 
 #include "sensor_data.h"
 #include "display_data.h"
-
+#include "display.h"
 
 class Timezone;
 
@@ -76,4 +76,5 @@ private:
 	int m_std_offset;
 	int m_dst_offset;
 	Timezone *m_tz;
+    Display m_display;
 };

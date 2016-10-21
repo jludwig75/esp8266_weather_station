@@ -95,6 +95,7 @@
     <ClInclude Include="..\shared\OOWebServer.h" />
     <ClInclude Include="..\shared\wifi_ap.h" />
     <ClInclude Include="..\shared\wifi_station.h" />
+    <ClInclude Include="display.h" />
     <ClInclude Include="display_data.h" />
     <ClInclude Include="sensor_data.h" />
     <ClInclude Include="weather_station_base_class.h" />
@@ -105,6 +106,7 @@
     <ClCompile Include="..\shared\ntp_client.cpp" />
     <ClCompile Include="..\shared\wifi_ap.cpp" />
     <ClCompile Include="..\shared\wifi_station.cpp" />
+    <ClCompile Include="display.cpp" />
     <ClCompile Include="display_data.cpp" />
     <ClCompile Include="sensor_data.cpp" />
     <ClCompile Include="weather_station_base_class.cpp" />

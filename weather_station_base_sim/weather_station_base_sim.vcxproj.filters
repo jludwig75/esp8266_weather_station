@@ -37,6 +37,9 @@
     <ClCompile Include="..\shared\config_file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="display_sim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\config_file.h">

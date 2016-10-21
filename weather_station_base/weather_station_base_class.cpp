@@ -23,6 +23,9 @@ const char* k_default_host_ssid = "ACESS_POINT";
 const char* k_default_host_password = "Password123";
 
 
+#define TFT_DC 9
+#define TFT_CS 10
+
 
 void reset()
 {
@@ -51,7 +54,8 @@ WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 	m_dst_string(k_default_tz_dst_name),
 	m_std_offset(k_default_std_tz_offset),
 	m_dst_offset(k_default_dst_tz_offset),
-	m_tz(NULL)
+	m_tz(NULL),
+    m_display(TFT_CS, TFT_DC)
 {
 }
 
@@ -514,9 +518,20 @@ void WeatherStationBase::update_time(bool update_now)
 void WeatherStationBase::draw_display()
 {
 	tmElements_t tm;
-	breakTime(m_tz->toLocal(now()), tm);
+	breakTime(m_tz->toLocal(m_last_display_data.time), tm);
 
-	// TODO: Go to LCD.
+    String time_string = String(hourFormat12(m_last_display_data.time)) + ":" + pad_string(String(tm.Minute), 2, '0');
+    String time_meridian = isAM(m_last_display_data.time) ? "am" : "pm";
+
+    String date_string = String(dayShortStr(tm.Wday)) + ", " + monthShortStr(tm.Month) + " " + String(tm.Day) + ", " + String(tmYearToCalendar(tm.Year));
+
+	// Draw on LCD.
+    m_display.update_time_string(time_string);
+    m_display.update_time_meridian(time_meridian);
+    m_display.update_date_string(date_string);
+    m_display.update_inside_temp_string(m_last_display_data.get_local_sensor_string());
+    m_display.update_outside_temp_string(m_last_display_data.get_remote_sensor_string());
+
 	String display = m_last_display_data.get_date_string() + " " + m_last_display_data.get_time_string() + " In: " + m_last_display_data.get_local_sensor_string() + " Out: " + m_last_display_data.get_remote_sensor_string();
 	Serial.println(display);
 }
