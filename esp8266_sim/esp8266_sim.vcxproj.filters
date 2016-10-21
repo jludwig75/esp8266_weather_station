@@ -80,5 +80,8 @@
     <ClCompile Include="Timezone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DS1307RTC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

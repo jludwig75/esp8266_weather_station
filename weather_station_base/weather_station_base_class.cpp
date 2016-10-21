@@ -7,6 +7,8 @@
 #include "config_file.h"
 
 #include <Timezone.h>
+#include <Wire.h>
+#include <DS1307RTC.h>  // a basic DS1307 library that returns time as a time_t
 
 #define CONFIG_FILE_NAME    "/ws_config.json"
 
@@ -80,6 +82,17 @@ void WeatherStationBase::server_begin()
 	strncpy(myDST.abbrev, m_dst_string.c_str(), sizeof(myDST.abbrev));
 	strncpy(mySTD.abbrev, m_std_string.c_str(), sizeof(mySTD.abbrev));
 	m_tz = new Timezone(myDST, mySTD);
+
+    setSyncProvider(RTC.get);   // the function to get the time from the RTC
+    if (timeStatus() != timeSet)
+    {
+        Serial.println("Unable to sync with the RTC");
+    }
+    else
+    {
+        Serial.println("RTC has set the system time");
+    }
+
 
 	m_dht.begin();
 	if (!start_access_point(ap_ssid, ap_password))
@@ -299,7 +312,9 @@ void WeatherStationBase::setTime()
 		tm.Year = year - 1970;
 
 		time_t new_time = makeTime(tm);
-		::setTime(m_tz->toUTC(new_time));
+        time_t utc_time = m_tz->toUTC(new_time);
+        RTC.set(utc_time);
+        ::setTime(utc_time);
 		m_last_display_data.time = new_time;
 	}
 	else
@@ -490,7 +505,9 @@ void WeatherStationBase::update_time(bool update_now)
 		return;
 	}
 
-	::setTime(m_tz->toUTC(new_time));
+    time_t utc_time = m_tz->toUTC(new_time);
+    RTC.set(utc_time);
+    ::setTime(utc_time);
 }
 
 
