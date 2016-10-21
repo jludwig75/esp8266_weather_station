@@ -41,7 +41,7 @@ String display_data::get_remote_sensor_string() const
 String display_data::get_time_string() const
 {
 	tmElements_t tm;
-	breakTime(now(), tm);
+	breakTime(time, tm);
 
 	return time_string(tm);
 }
@@ -49,7 +49,7 @@ String display_data::get_time_string() const
 String display_data::get_date_string() const
 {
 	tmElements_t tm;
-	breakTime(now(), tm);
+	breakTime(time, tm);
 
 	return date_string(tm);
 }

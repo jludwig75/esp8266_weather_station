@@ -54,7 +54,7 @@ WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 	m_std_offset(k_default_std_tz_offset),
 	m_dst_offset(k_default_dst_tz_offset),
 	m_tz(NULL),
-    m_display(TFT_CS, TFT_DC)
+    m_display(TFT_CS, TFT_DC),
 	m_rtc(NULL)
 {
 }
@@ -321,7 +321,7 @@ void WeatherStationBase::setTime()
         time_t utc_time = m_tz->toUTC(new_time);
 		m_rtc->set(utc_time);
         ::setTime(utc_time);
-		m_last_display_data.time = new_time;
+		m_last_display_data.time = m_tz->toLocal(new_time);
 	}
 	else
 	{
@@ -518,7 +518,7 @@ void WeatherStationBase::update_time(bool update_now)
 void WeatherStationBase::draw_display()
 {
 	tmElements_t tm;
-	breakTime(m_tz->toLocal(m_last_display_data.time), tm);
+	breakTime(m_last_display_data.time, tm);
 
     String time_string = String(hourFormat12(m_last_display_data.time)) + ":" + pad_string(String(tm.Minute), 2, '0');
     String time_meridian = isAM(m_last_display_data.time) ? "am" : "pm";
