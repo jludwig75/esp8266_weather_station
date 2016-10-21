@@ -11,7 +11,7 @@
 
 
 #define DHTTYPE DHT22
-#define DHTPIN  2
+#define DHTPIN  12
 
 
 WeatherStationBase g_weather_station_base(DHTPIN, DHTTYPE);
