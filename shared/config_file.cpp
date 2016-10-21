@@ -5,11 +5,6 @@
 
 #include <ArduinoJson.h>
 
-#ifdef WIN32
-#define	JSON_NS	ArduinoJson
-#else
-#define	JSON_NS
-#endif // WIN32
 
 ConfigFile::ConfigFile(const String & file_name) : _file_name(file_name)
 {
@@ -75,7 +70,7 @@ bool ConfigFile::Save()
 		return false;
 	}
 
-	JSON_NS::String str;
+	String str;
 
 	json.printTo(str);
 
