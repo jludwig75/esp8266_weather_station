@@ -14,6 +14,8 @@
 #include "display.h"
 
 class Timezone;
+class DS1307RTC;
+
 
 
 class WeatherStationBase : public OOWebServer<WeatherStationBase>
@@ -77,4 +79,5 @@ private:
 	int m_dst_offset;
 	Timezone *m_tz;
     Display m_display;
+	DS1307RTC *m_rtc;
 };

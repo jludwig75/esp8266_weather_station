@@ -7,8 +7,7 @@
 #include "config_file.h"
 
 #include <Timezone.h>
-#include <Wire.h>
-#include <DS1307RTC.h>  // a basic DS1307 library that returns time as a time_t
+#include "DS1307RTC.h"  // a basic DS1307 library that returns time as a time_t
 
 #define CONFIG_FILE_NAME    "/ws_config.json"
 
@@ -56,6 +55,7 @@ WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 	m_dst_offset(k_default_dst_tz_offset),
 	m_tz(NULL),
     m_display(TFT_CS, TFT_DC)
+	m_rtc(NULL)
 {
 }
 
@@ -69,6 +69,8 @@ WeatherStationBase::~WeatherStationBase()
 void WeatherStationBase::server_begin()
 {
 	SPIFFS.begin();
+
+	m_rtc = new DS1307RTC;
 
 	load_config();
 
@@ -87,7 +89,7 @@ void WeatherStationBase::server_begin()
 	strncpy(mySTD.abbrev, m_std_string.c_str(), sizeof(mySTD.abbrev));
 	m_tz = new Timezone(myDST, mySTD);
 
-    setSyncProvider(RTC.get);   // the function to get the time from the RTC
+    setSyncProvider(m_rtc->get);   // the function to get the time from the RTC
     if (timeStatus() != timeSet)
     {
         Serial.println("Unable to sync with the RTC");
@@ -317,7 +319,7 @@ void WeatherStationBase::setTime()
 
 		time_t new_time = makeTime(tm);
         time_t utc_time = m_tz->toUTC(new_time);
-        RTC.set(utc_time);
+		m_rtc->set(utc_time);
         ::setTime(utc_time);
 		m_last_display_data.time = new_time;
 	}
@@ -501,17 +503,15 @@ void WeatherStationBase::update_time(bool update_now)
 		}
 	}
 	// Get the time via NTP
-	time_t new_time = m_tz->toLocal(m_ntp_client.get_time());
-
-	// Update the time
+	time_t new_time = m_ntp_client.get_time();
 	if (new_time == 0)
 	{
 		return;
 	}
 
-    time_t utc_time = m_tz->toUTC(new_time);
-    RTC.set(utc_time);
-    ::setTime(utc_time);
+	// Update the time
+	m_rtc->set(new_time);
+    ::setTime(new_time);
 }
 
 

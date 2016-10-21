@@ -51,6 +51,9 @@
     <ClInclude Include="display.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DS1307RTC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sensor_data.cpp">
@@ -74,7 +77,11 @@
     <ClCompile Include="..\shared\config_file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="display.cpp">
+=======
+    <ClCompile Include="DS1307RTC.cpp">
+>>>>>>> Fixed apparent RTC/ESP8266 my moving class local
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
