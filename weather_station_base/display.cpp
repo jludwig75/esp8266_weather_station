@@ -2,16 +2,23 @@
 
 #include <HardwareSerial.h>
 
-Display::Region time_region = { 1, 1, 5, 1 };
-Display::Region time_meridian_region = { 6, 1, 2, 1 };
-Display::Region date_region = { 1, 2, 20, 1 };
-Display::Region inside_temp_region = { 1, 3, 20, 1 };
-Display::Region outside_temp_region = { 1, 4, 20, 1 };
+Display::Region time_region = { 20, 40, 100, 35, 4 };
+Display::Region time_meridian_region = { 125, 50, 30, 25, 2 };
+Display::Region date_region = { 20, 85, 210, 20, 2 };
+Display::Region inside_temp_region = { 20, 160, 180, 20, 2 };
+Display::Region outside_temp_region = { 20, 220, 180, 20, 2 };
 
 
-Display::Display(int8_t _CS, int8_t _DC, int8_t _RST)
+Display::Display(int8_t _CS, int8_t _DC, int8_t _RST) : m_lcd(_CS, _DC, _RST)
 {
 
+}
+
+void Display::begin()
+{
+	m_lcd.begin();
+	m_lcd.setRotation(2);
+	m_lcd.fillScreen(ILI9341_LIGHTGREY);
 }
 
 void Display::update_time_string(const String & time_string)
@@ -75,6 +82,8 @@ void Display::clear_region(const Region &region)
 	Serial.print(", ");
 	Serial.print(region.y);
 	Serial.println(")");
+
+	m_lcd.fillRect(region.x, region.y, region.w, region.h, ILI9341_LIGHTGREY);
 }
 
 void Display::write_region(const Region &region, const String &str)
@@ -85,4 +94,8 @@ void Display::write_region(const Region &region, const String &str)
 	Serial.print(region.y);
 	Serial.print("): ");
 	Serial.println(str);
+	m_lcd.setCursor(region.x + 2, region.y + 2);
+	m_lcd.setTextColor(ILI9341_BLACK);
+	m_lcd.setTextSize(region.font_size);
+	m_lcd.print(str);
 }

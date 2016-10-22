@@ -22,8 +22,8 @@ const char* k_default_host_ssid = "ACESS_POINT";
 const char* k_default_host_password = "Password123";
 
 
-#define TFT_DC 9
-#define TFT_CS 10
+#define TFT_DC 2
+#define TFT_CS 5
 
 
 void reset()
@@ -69,6 +69,8 @@ WeatherStationBase::~WeatherStationBase()
 void WeatherStationBase::server_begin()
 {
 	SPIFFS.begin();
+
+	m_display.begin();
 
 	m_rtc = new DS1307RTC;
 

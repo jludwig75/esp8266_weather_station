@@ -1,9 +1,7 @@
 #pragma once
 
 #include <WString.h>
-
-
-class Adafruit_ILI9341;
+#include <Adafruit_ILI9341.h>
 
 
 class Display
@@ -15,9 +13,11 @@ public:
 		int16_t y;
 		int16_t w;
 		int16_t h;
-
+		uint8_t font_size;
 	};
     Display(int8_t _CS, int8_t _DC, int8_t _RST = -1);
+
+	void begin();
 
     void update_time_string(const String & time_string);        // 5:09
     void update_time_meridian(const String & time_meridian);    // AM/PM
@@ -29,6 +29,7 @@ protected:
 	void clear_region(const Region &region);
 	void write_region(const Region &region, const String &str);
 private:
+	Adafruit_ILI9341 m_lcd;
 	String m_last_time_string;
 	String m_last_time_meridian;
 	String m_last_date_string;

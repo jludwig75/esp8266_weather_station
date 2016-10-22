@@ -29,44 +29,44 @@
 88	
 </Source>
       </BreakPoint>
-      <BreakPoint Index="2" Name="weather_station_base_class.cpp, line 324" Id="08e89ccb-9876-4257-b605-ee74b888d524" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="c:\code\esp8266_weather_station\weather_station_base\weather_station_base_class.cpp" FileLine="324" FileColumn="1" FunctionName="setTime()" FunctionLineOffset="24" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='08e89ccb-9876-4257-b605-ee74b888d524'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
-        <Source>317			}
-318			tm.Year = year - 1970;
-319	
-320			time_t new_time = makeTime(tm);
-321	        time_t utc_time = m_tz-&gt;toUTC(new_time);
-322			m_rtc-&gt;set(utc_time);
-323	        ::setTime(utc_time);
---&gt;324			m_last_display_data.time = m_tz-&gt;toLocal(new_time);
-325		}
-326		else
-327		{
-328			Serial.println("setTime: arguments missing");
-329		}
-330	
-331	    redirect_to("/");
-332	}
-333	
+      <BreakPoint Index="2" Name="weather_station_base_class.cpp, line 326" Id="08e89ccb-9876-4257-b605-ee74b888d524" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="c:\code\esp8266_weather_station\weather_station_base\weather_station_base_class.cpp" FileLine="326" FileColumn="1" FunctionName="setTime()" FunctionLineOffset="24" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='08e89ccb-9876-4257-b605-ee74b888d524'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
+        <Source>319			}
+320			tm.Year = year - 1970;
+321	
+322			time_t new_time = makeTime(tm);
+323	        time_t utc_time = m_tz-&gt;toUTC(new_time);
+324			m_rtc-&gt;set(utc_time);
+325	        ::setTime(utc_time);
+--&gt;326			m_last_display_data.time = m_tz-&gt;toLocal(new_time);
+327		}
+328		else
+329		{
+330			Serial.println("setTime: arguments missing");
+331		}
+332	
+333	    redirect_to("/");
+334	}
+335	
 </Source>
       </BreakPoint>
-      <BreakPoint Index="3" Name="weather_station_base_class.cpp, line 373" Id="6d49dcc4-4f66-4b50-a24d-d7dbc91cd086" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="c:\code\esp8266_weather_station\weather_station_base\weather_station_base_class.cpp" FileLine="373" FileColumn="1" FunctionName="setTimeZone()" FunctionLineOffset="39" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='6d49dcc4-4f66-4b50-a24d-d7dbc91cd086'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
-        <Source>366			delete m_tz;
-367			TimeChangeRule myDST = { "", Second, Sun, Mar, 2, m_dst_offset };    //Daylight time = UTC - 6 hours
-368			TimeChangeRule mySTD = { "", First, Sun, Nov, 2, m_std_offset };     //Standard time = UTC - 7 hours
-369			strncpy(myDST.abbrev, m_dst_string.c_str(), sizeof(myDST.abbrev));
-370			strncpy(mySTD.abbrev, m_std_string.c_str(), sizeof(mySTD.abbrev));
-371			m_tz = new Timezone(myDST, mySTD);
-372	
---&gt;373			m_last_display_data.time = m_tz-&gt;toLocal(now());
-374		}
-375		else
-376		{
-377			Serial.println("setTimeZone: arguments missing");
-378		}
-379	
-380		redirect_to("/");
-381	}
-382	
+      <BreakPoint Index="3" Name="weather_station_base_class.cpp, line 375" Id="6d49dcc4-4f66-4b50-a24d-d7dbc91cd086" Enabled="1" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="c:\code\esp8266_weather_station\weather_station_base\weather_station_base_class.cpp" FileLine="375" FileColumn="1" FunctionName="setTimeZone()" FunctionLineOffset="39" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='6d49dcc4-4f66-4b50-a24d-d7dbc91cd086'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
+        <Source>368			delete m_tz;
+369			TimeChangeRule myDST = { "", Second, Sun, Mar, 2, m_dst_offset };    //Daylight time = UTC - 6 hours
+370			TimeChangeRule mySTD = { "", First, Sun, Nov, 2, m_std_offset };     //Standard time = UTC - 7 hours
+371			strncpy(myDST.abbrev, m_dst_string.c_str(), sizeof(myDST.abbrev));
+372			strncpy(mySTD.abbrev, m_std_string.c_str(), sizeof(mySTD.abbrev));
+373			m_tz = new Timezone(myDST, mySTD);
+374	
+--&gt;375			m_last_display_data.time = m_tz-&gt;toLocal(now());
+376		}
+377		else
+378		{
+379			Serial.println("setTimeZone: arguments missing");
+380		}
+381	
+382		redirect_to("/");
+383	}
+384	
 </Source>
       </BreakPoint>
     </BreakPoints>
