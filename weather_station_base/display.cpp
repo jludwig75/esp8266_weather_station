@@ -2,8 +2,8 @@
 
 #include <HardwareSerial.h>
 
-Display::Region time_region = { 20, 40, 100, 35, 4 };
-Display::Region time_meridian_region = { 125, 50, 30, 25, 2 };
+Display::Region time_region = { 20, 40, 120, 35, 4 };
+Display::Region time_meridian_region = { 145, 50, 30, 25, 2 };
 Display::Region date_region = { 20, 85, 210, 20, 2 };
 Display::Region inside_temp_region = { 20, 160, 180, 20, 2 };
 Display::Region outside_temp_region = { 20, 220, 180, 20, 2 };
