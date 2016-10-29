@@ -25,6 +25,8 @@ void setup()
 {
 	Serial.begin(115200);
 	g_weather_station_base.begin();
+	pinMode(15, OUTPUT);
+	analogWrite(15, 255);
 }
 
 void loop()
