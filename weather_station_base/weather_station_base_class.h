@@ -62,7 +62,8 @@ protected:
 private:
 	void draw_display();
 	void set_backlight_level(int level);
-	void adjust_back_light();
+	void adjust_back_light(bool force = false);
+	void handle_backlight_button();
 
 	bool m_wifi_connected;
 	time_t m_last_time_update;
@@ -85,4 +86,5 @@ private:
 	DS1307RTC *m_rtc;
 	int m_backlight_level;
 	int m_last_light_level;
+	bool m_boost_backlight;
 };

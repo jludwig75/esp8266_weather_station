@@ -57,7 +57,8 @@ WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 	m_display(TFT_CS, TFT_DC),
 	m_rtc(NULL),
 	m_backlight_level(511),
-	m_last_light_level(0)
+	m_last_light_level(0),
+	m_boost_backlight(false)
 {
 }
 
@@ -74,7 +75,8 @@ void WeatherStationBase::server_begin()
 
 	m_display.begin();
 
-	//pinMode(12, OUTPUT);
+	pinMode(12, OUTPUT);
+	pinMode(16, INPUT);
 	set_backlight_level(m_backlight_level);
 
 	m_rtc = new DS1307RTC;
@@ -436,6 +438,7 @@ void WeatherStationBase::on_loop()
 	update_local_sensor_data();
 	update_time();
 	handleClient();
+	handle_backlight_button();
 }
 
 void WeatherStationBase::update_display_timer_func(WeatherStationBase *ws_base)
@@ -565,17 +568,42 @@ void WeatherStationBase::set_backlight_level(int level)
 	analogWrite(12, 1023 - m_backlight_level);
 }
 
-void WeatherStationBase::adjust_back_light()
+void WeatherStationBase::adjust_back_light(bool force)
 {
 	int light_level = analogRead(A0);
-	if (abs(light_level - m_last_light_level) > 10)
+	if (abs(light_level - m_last_light_level) > 10 || force)
 	{
 		int new_backlight_level = map(light_level, 30, 900, 4, 200);
 
-		//Serial.printf("Adjusting backlight %d => %d\n", light_level, new_backlight_level);
+		if (m_boost_backlight)
+		{
+			Serial.println ("Boosting backlight level");
+			new_backlight_level += 128;
+		}
 
 		set_backlight_level(new_backlight_level);
 		m_last_light_level = light_level;
 	}
 }
 
+void WeatherStationBase::handle_backlight_button()
+{
+	if (digitalRead(16) == LOW)
+	{
+		if (!m_boost_backlight)
+		{
+			Serial.println("Button pressed.");
+			m_boost_backlight = true;
+			adjust_back_light(true);
+		}
+	}
+	else
+	{
+		if (m_boost_backlight)
+		{
+			Serial.println("Button released.");
+			m_boost_backlight = false;
+			adjust_back_light(true);
+		}
+	}
+}
