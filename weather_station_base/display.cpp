@@ -18,7 +18,7 @@ void Display::begin()
 {
 	m_lcd.begin();
 	m_lcd.setRotation(2);
-	m_lcd.fillScreen(ILI9341_LIGHTGREY);
+	m_lcd.fillScreen(ILI9341_WHITE);
 }
 
 void Display::update_time_string(const String & time_string)
@@ -83,7 +83,7 @@ void Display::clear_region(const Region &region)
 	Serial.print(region.y);
 	Serial.println(")");
 
-	m_lcd.fillRect(region.x, region.y, region.w, region.h, ILI9341_LIGHTGREY);
+	m_lcd.fillRect(region.x, region.y, region.w, region.h, ILI9341_WHITE);
 }
 
 void Display::write_region(const Region &region, const String &str)

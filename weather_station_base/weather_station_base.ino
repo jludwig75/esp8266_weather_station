@@ -16,7 +16,7 @@
 
 
 #define DHTTYPE DHT22
-#define DHTPIN  12
+#define DHTPIN  10
 
 
 WeatherStationBase g_weather_station_base(DHTPIN, DHTTYPE);
@@ -25,8 +25,6 @@ void setup()
 {
 	Serial.begin(115200);
 	g_weather_station_base.begin();
-	pinMode(15, OUTPUT);
-	analogWrite(15, 255);
 }
 
 void loop()

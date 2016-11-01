@@ -7,7 +7,12 @@ Display::Region inside_temp_region = { 1, 3, 20, 1 };
 Display::Region outside_temp_region = { 1, 4, 20, 1 };
 
 
-Display::Display(int8_t _CS, int8_t _DC, int8_t _RST)
+Display::Display(int8_t _CS, int8_t _DC, int8_t _RST) : m_lcd(_CS, _DC, _RST)
+{
+
+}
+
+void Display::begin()
 {
 
 }

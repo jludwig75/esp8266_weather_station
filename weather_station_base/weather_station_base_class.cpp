@@ -12,7 +12,7 @@
 #define CONFIG_FILE_NAME    "/ws_config.json"
 
 
-#define DISPLAY_UPDATE_INTERVAL_MS      1000              // 1 second
+#define DISPLAY_UPDATE_INTERVAL_MS      333               // 0.333 seconds
 #define LOCAL_SENSOR_UPDATE_INTERVAL_MS ( 1 * 60 * 1000)  // 1 minute
 #define UPDATE_TIME_UPDATE_INTERVAL_MS  (15 * 60 * 1000)  // 15 minutes
 #define UDP_LISTEN_PORT                 8888
@@ -54,8 +54,10 @@ WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 	m_std_offset(k_default_std_tz_offset),
 	m_dst_offset(k_default_dst_tz_offset),
 	m_tz(NULL),
-    m_display(TFT_CS, TFT_DC),
-	m_rtc(NULL)
+	m_display(TFT_CS, TFT_DC),
+	m_rtc(NULL),
+	m_backlight_level(511),
+	m_last_light_level(0)
 {
 }
 
@@ -71,6 +73,9 @@ void WeatherStationBase::server_begin()
 	SPIFFS.begin();
 
 	m_display.begin();
+
+	//pinMode(12, OUTPUT);
+	set_backlight_level(m_backlight_level);
 
 	m_rtc = new DS1307RTC;
 
@@ -245,6 +250,9 @@ void WeatherStationBase::handle_root()
 	page_template.replace("<%outside_temperature%>", 0xffff == m_last_display_data.remote_data.temperature ? "--" : String(m_last_display_data.remote_data.temperature));
 	page_template.replace("<%outside_humidity%>", 0xffff == m_last_display_data.remote_data.humidity ? "--" : String(m_last_display_data.remote_data.humidity));
 
+	page_template.replace("<%backlight_level%>", String(m_backlight_level));
+	page_template.replace("<%light_sensor%>", String(analogRead(A0)));
+
     String local_ip_string = "Not connected";
     if (is_wifi_connected())
     {
@@ -382,7 +390,6 @@ void WeatherStationBase::setTimeZone()
 	redirect_to("/");
 }
 
-
 void WeatherStationBase::handleWiFiConfig()
 {
 	String page_template = get_current_page_template();
@@ -435,8 +442,11 @@ void WeatherStationBase::update_display_timer_func(WeatherStationBase *ws_base)
 {
 	ws_base->update_display();
 }
+
 void WeatherStationBase::update_display(bool update_now)
 {
+	adjust_back_light();
+
 	// Get a snapshot of the time and sensor data.
 	time_t current_time = m_tz->toLocal(now());
 	sensor_data current_local_sensor_data = m_current_local_sensor_data;
@@ -537,3 +547,35 @@ void WeatherStationBase::draw_display()
 	String display = m_last_display_data.get_date_string() + " " + m_last_display_data.get_time_string() + " In: " + m_last_display_data.get_local_sensor_string() + " Out: " + m_last_display_data.get_remote_sensor_string();
 	Serial.println(display);
 }
+
+void WeatherStationBase::set_backlight_level(int level)
+{
+	if (level > 1023)
+	{
+		level = 1023;
+	}
+	if (level < 0)
+	{
+		level = 0;
+	}
+
+	m_backlight_level = level;
+
+	// Using PNP resistor so logic will be inverted.
+	analogWrite(12, 1023 - m_backlight_level);
+}
+
+void WeatherStationBase::adjust_back_light()
+{
+	int light_level = analogRead(A0);
+	if (abs(light_level - m_last_light_level) > 10)
+	{
+		int new_backlight_level = map(light_level, 30, 900, 4, 200);
+
+		//Serial.printf("Adjusting backlight %d => %d\n", light_level, new_backlight_level);
+
+		set_backlight_level(new_backlight_level);
+		m_last_light_level = light_level;
+	}
+}
+

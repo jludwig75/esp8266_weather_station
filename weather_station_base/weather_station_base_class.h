@@ -50,6 +50,7 @@ public:
 protected:
 	static void update_display_timer_func(WeatherStationBase *ws_base);
 	void update_display(bool update_now = false);
+
 	void update_local_sensor_data(bool update_now = false);
 	void update_time(bool update_now = false);
 
@@ -60,6 +61,8 @@ protected:
 
 private:
 	void draw_display();
+	void set_backlight_level(int level);
+	void adjust_back_light();
 
 	bool m_wifi_connected;
 	time_t m_last_time_update;
@@ -69,7 +72,7 @@ private:
     DHT m_dht;
 	NtpClient m_ntp_client;
 	Ticker m_display_timer;
-	Ticker m_update_time_timer;
+	Ticker m_adjust_backlight_timer;
 	sensor_data m_current_local_sensor_data;
 	sensor_data m_current_remote_sensor_data;
 	display_data m_last_display_data;
@@ -80,4 +83,6 @@ private:
 	Timezone *m_tz;
     Display m_display;
 	DS1307RTC *m_rtc;
+	int m_backlight_level;
+	int m_last_light_level;
 };

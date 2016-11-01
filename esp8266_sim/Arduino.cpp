@@ -40,3 +40,26 @@ IPAddress get_local_ip()
 {
     return IPAddress(127, 0, 0, 1);
 }
+
+extern "C" {
+
+	void pinMode(uint8_t, uint8_t)
+	{
+
+	}
+
+	void analogWrite(uint8_t, int)
+	{
+
+	}
+
+	int analogRead(uint8_t)
+	{
+		return 511;
+	}
+
+}
+
+long map(long x, long in_min, long in_max, long out_min, long out_max) {
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}

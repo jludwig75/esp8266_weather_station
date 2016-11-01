@@ -147,6 +147,8 @@
     <ClInclude Include="TimeLib.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Adafruit_GFX.cpp" />
+    <ClCompile Include="Adafruit_ILI9341_sim.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="DateStrings.cpp" />
     <ClCompile Include="DHT.cpp" />
