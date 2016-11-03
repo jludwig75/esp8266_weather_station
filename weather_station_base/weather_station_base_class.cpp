@@ -98,6 +98,26 @@ void WeatherStationBase::server_begin()
 	strncpy(mySTD.abbrev, m_std_string.c_str(), sizeof(mySTD.abbrev));
 	m_tz = new Timezone(myDST, mySTD);
 
+	if (m_rtc->chipPresent())
+	{
+		Serial.println("RTC is available");
+		tmElements_t tm;
+		if (!m_rtc->read(tm))
+		{
+			Serial.println("Failed to read time from RTC");
+		}
+		else
+		{
+			Serial.println("Setting time from RTC");
+			time_t t = makeTime(tm);
+			::setTime(t);
+		}
+	}
+	else
+	{
+		Serial.println("RTC is not available");
+	}
+
     setSyncProvider(m_rtc->get);   // the function to get the time from the RTC
     if (timeStatus() != timeSet)
     {

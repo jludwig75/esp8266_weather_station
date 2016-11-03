@@ -24,6 +24,7 @@ WeatherStationBase g_weather_station_base(DHTPIN, DHTTYPE);
 void setup()
 {
 	Serial.begin(115200);
+	Serial.println("Starting weather station sketch...");
 	g_weather_station_base.begin();
 }
 
