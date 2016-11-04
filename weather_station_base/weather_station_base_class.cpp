@@ -9,6 +9,8 @@
 #include <Timezone.h>
 #include "DS1307RTC.h"  // a basic DS1307 library that returns time as a time_t
 
+#include <RtcDS3231.h>
+
 #define CONFIG_FILE_NAME    "/ws_config.json"
 
 
@@ -22,8 +24,8 @@ const char* k_default_host_ssid = "ACESS_POINT";
 const char* k_default_host_password = "Password123";
 
 
-#define TFT_DC 2
-#define TFT_CS 5
+#define TFT_DC 16
+#define TFT_CS 0
 
 
 void reset()
@@ -64,6 +66,7 @@ WeatherStationBase::WeatherStationBase(uint8_t dht_pin, uint8_t dht_type) :
 
 WeatherStationBase::~WeatherStationBase()
 {
+	delete m_rtc;
 	delete m_tz;
 }
 
@@ -76,10 +79,50 @@ void WeatherStationBase::server_begin()
 	m_display.begin();
 
 	pinMode(12, OUTPUT);
-	pinMode(16, INPUT);
+	pinMode(10, INPUT);
 	set_backlight_level(m_backlight_level);
 
-	m_rtc = new DS1307RTC;
+	m_rtc = new RtcDS3231;
+
+	// never assume the Rtc was last configured by you, so
+	// just clear them to your needed state
+	m_rtc->Enable32kHzPin(false);
+	m_rtc->SetSquareWavePin(DS3231SquareWavePin_ModeNone);
+
+	m_rtc->Begin();
+	if (!m_rtc->GetIsRunning())
+	{
+		Serial.println("RTC was not actively running, starting now");
+		m_rtc->SetIsRunning(true);
+		if (m_rtc->GetIsRunning())
+		{
+			Serial.println("RTC is running");
+		}
+		else
+		{
+			Serial.println("RTC is still not running");
+		}
+	}
+	else
+	{
+		Serial.println("RTC is running");
+	}
+
+	if (!m_rtc->IsDateTimeValid())
+	{
+		Serial.println("RTC time not valid");
+	}
+	else
+	{
+		Serial.println("RTC time is valid");
+		RtcDateTime now = m_rtc->GetDateTime();
+		Serial.printf("RTC time = %lu\n", now.Epoch32Time());
+	}
+
+	if (m_rtc->IsDateTimeValid())
+	{
+		::setTime(m_rtc->GetDateTime().Epoch32Time());
+	}
 
 	load_config();
 
@@ -97,37 +140,6 @@ void WeatherStationBase::server_begin()
 	strncpy(myDST.abbrev, m_dst_string.c_str(), sizeof(myDST.abbrev));
 	strncpy(mySTD.abbrev, m_std_string.c_str(), sizeof(mySTD.abbrev));
 	m_tz = new Timezone(myDST, mySTD);
-
-	if (m_rtc->chipPresent())
-	{
-		Serial.println("RTC is available");
-		tmElements_t tm;
-		if (!m_rtc->read(tm))
-		{
-			Serial.println("Failed to read time from RTC");
-		}
-		else
-		{
-			Serial.println("Setting time from RTC");
-			time_t t = makeTime(tm);
-			::setTime(t);
-		}
-	}
-	else
-	{
-		Serial.println("RTC is not available");
-	}
-
-    setSyncProvider(m_rtc->get);   // the function to get the time from the RTC
-    if (timeStatus() != timeSet)
-    {
-        Serial.println("Unable to sync with the RTC");
-    }
-    else
-    {
-        Serial.println("RTC has set the system time");
-    }
-
 
 	m_dht.begin();
 	if (!start_access_point(ap_ssid, ap_password))
@@ -351,7 +363,11 @@ void WeatherStationBase::setTime()
 
 		time_t new_time = makeTime(tm);
         time_t utc_time = m_tz->toUTC(new_time);
-		m_rtc->set(utc_time);
+
+		RtcDateTime dt_new;
+		dt_new.InitWithEpoch32Time(utc_time);
+		m_rtc->SetDateTime(dt_new);
+
         ::setTime(utc_time);
 		m_last_display_data.time = m_tz->toLocal(new_time);
 	}
@@ -545,8 +561,12 @@ void WeatherStationBase::update_time(bool update_now)
 	}
 
 	// Update the time
-	m_rtc->set(new_time);
-    ::setTime(new_time);
+	RtcDateTime now_dt;
+	now_dt.InitWithEpoch32Time(new_time);
+	Serial.printf("Setting RTC time to %lu\n", new_time);
+	m_rtc->SetDateTime(now_dt);
+
+	::setTime(new_time);
 }
 
 
@@ -608,7 +628,7 @@ void WeatherStationBase::adjust_back_light(bool force)
 
 void WeatherStationBase::handle_backlight_button()
 {
-	if (digitalRead(16) == LOW)
+	if (digitalRead(10) == LOW)
 	{
 		if (!m_boost_backlight)
 		{

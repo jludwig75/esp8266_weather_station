@@ -1,3 +1,9 @@
+#include <RtcDateTime.h>
+#include <RtcDS1307.h>
+#include <RtcDS3231.h>
+#include <RtcTemperature.h>
+#include <RtcUtility.h>
+
 
 #include <ArduinoJson.h>
 
@@ -16,7 +22,7 @@
 
 
 #define DHTTYPE DHT22
-#define DHTPIN  10
+#define DHTPIN  2
 
 
 WeatherStationBase g_weather_station_base(DHTPIN, DHTTYPE);

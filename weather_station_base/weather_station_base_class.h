@@ -14,7 +14,7 @@
 #include "display.h"
 
 class Timezone;
-class DS1307RTC;
+class RtcDS3231;
 
 
 
@@ -83,7 +83,7 @@ private:
 	int m_dst_offset;
 	Timezone *m_tz;
     Display m_display;
-	DS1307RTC *m_rtc;
+	RtcDS3231 *m_rtc;
 	int m_backlight_level;
 	int m_last_light_level;
 	bool m_boost_backlight;
