@@ -613,7 +613,7 @@ void WeatherStationBase::adjust_back_light(bool force)
 	int light_level = analogRead(A0);
 	if (abs(light_level - m_last_light_level) > 10 || force)
 	{
-		int new_backlight_level = map(light_level, 30, 900, 4, 200);
+		int new_backlight_level = map(light_level, 10, 900, 25, 200);
 
 		if (m_boost_backlight)
 		{
